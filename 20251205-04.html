@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>受教與發心 - 閃示卡</title>
+    <title>受教與發心</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
@@ -13,10 +13,7 @@
         #progress-indicator { font-size: 1.1rem; font-weight: bold; color: #5d4037; }
         .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
         .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
-        
-        /* 核心修改：line-height 加大，讓換行更明顯 */
         .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
-        
         .mode-q .content-text { font-size: 1.8rem; font-weight: bold; color: #2c3e50; }
         .control-bar { flex-shrink: 0; padding: 20px; background-color: #fff; border-top: 1px solid #ddd; display: flex; justify-content: center; }
         .toggle-btn { width: 100%; max-width: 400px; padding: 18px 0; border: none; border-radius: 12px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -24,7 +21,6 @@
         .btn-show-question { background-color: #2c3e50; color: #fff; }
         .btn-locked { background-color: #ccc !important; color: #888 !important; cursor: not-allowed; box-shadow: none; }
         #status-msg { text-align: center; font-size: 0.8rem; color: #aaa; padding-bottom: 5px; background-color: #fff; }
-        #debug-btn { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 100; opacity: 0.2; font-size: 10px; }
     </style>
 </head>
 <body>
@@ -42,10 +38,9 @@
     <div class="control-bar">
         <button id="toggle-btn" class="toggle-btn btn-locked" onclick="toggleMode()">解答</button>
     </div>
-    <button id="debug-btn" onclick="toggleDebug()">測試:強制解鎖</button>
 
 <script>
-    const quizData = [{"q": "甚麼是「受教」與「發心」？", "a": "1. 受教： 指聽聞佛法、接觸教理。文中提到，這包含了對法門大意有初步的領會，甚至是只要經文「過耳過眼」，將解脫的種子種入心中，都屬於受教的範圍。<br>2. 發心： 在這裡特指「生起決定性的信心」。也就是斷除內心的疑慮，對往生淨土建立起真實、不動搖的信願。<br>關鍵區別： 法然上人強調這兩者不必同時發生。一個人可以先「受教」（懂道理），但可能要經過一段時間的消化、碰撞，等待一個特定的機緣（觸緣），才能真正「發心」（斷疑生信）。<br>這個概念很有趣，它說明了為什麼有時候我們道理都懂，卻還沒有那種「完全安心」的感覺。"}, {"q": "根據法然上人對弟子勢觀的開示，「受教」與「發心」之間是什麼關係？", "a": "關鍵區別： 法然上人強調這兩者不必同時發生。一個人可以先「受教」（懂道理），但可能要經過一段時間的消化、碰撞，等待一個特定的機緣（觸緣），才能真正「發心」（斷疑生信）。這個概念很有趣，它說明了為什麼有時候我們道理都懂，卻還沒有那種「完全安心」的感覺。"}, {"q": "在公案中，山僧向法然上人請教的核心問題是什麼？", "a": "他雖已了解淨土法門大意，但內心仍有疑慮，未能建立決定往生的信心。"}, {"q": "法然上人給予有疑惑的山僧什麼樣的建議？", "a": "他建議山僧應當祈求三寶之力冥冥中加被，以求疑根永斷、信心開發。"}, {"q": "聽了法然上人的話後，山僧採取了什麼行動？", "a": "他每日殷勤地在佛前禮拜祈求三寶加被。"}, {"q": "山僧看到上梁的奇觀後，心中產生了怎樣的類比與領悟？", "a": "他領悟到凡夫的巧思之力尚能如此，阿彌陀如來的力量決定更不可思議。"}, {"q": "山僧的信心是如何建立起來的？他想通了哪兩個對應的願望？", "a": "他想到自己有「願生之志」，而阿彌陀佛有「接引之誓」，一個願往、一個願接，必然能夠往生。"}, {"q": "當山僧對往生生起決定信心後，他內心的疑慮發生了什麼變化？", "a": "一切疑慮如風掃霜，頓斷無遺。"}, {"q": "山僧在建立決定信心、過了三年大安心的生活後，最終的結局是什麼？", "a": "他自在往生淨土，並伴隨諸多祥瑞的徵兆。"}, {"q": "作者從此公案中得到的第一個啟發是什麼？", "a": "世間與出世間的一切困難，都可以遙遙祈求三寶的聖力冥中加被。"}, {"q": "作者從公案得到的第二個啟發，關於受教與發心之間的時間關係是什麼？", "a": "受教與發心不但不必同時，現實中往往需要經歷一段漫長的碰撞、消化、吸收過程。"}, {"q": "為何說這個公案足以令一切弘法者感到安慰？", "a": "因為只要所弘內容正確，一切努力都不會白費，對方遲早會發心，可謂「功不唐捐」。"}, {"q": "根據作者的觀點，弘法者只要讓對方「過耳過眼」，根本上就已經達成了什麼？", "a": "受教。"}, {"q": "大乘經中的流通文處常說，為人說一偈一句或抄寫經文即得功德，這說明了功德成立的關鍵是什麼？", "a": "功德在於「所作當下」便具足，而非取決於對方是否信受或流布多廣。"}, {"q": "此公案提醒弘法者，當面對頑硬的弘法對象時，應抱持何種心態？", "a": "不必心焦心急，只管種下解脫種子即可。"}];
+    const quizData = [{"q": "根據法然上人對弟子勢觀的開示，「受教」與「發心」之間是什麼關係？", "a": "此二者不必同時發生，因為發心有時是因觸緣而發起的。"}, {"q": "根據作者的觀點，弘法者只要讓對方「過耳過眼」，根本上就已經達成了什麼？", "a": "受教。"}, {"q": "甚麼是「受教」與「發心」？", "a": "1. 受教： 指聽聞佛法、接觸教理。文中提到，這包含了對法門大意有初步的領會，甚至是只要經文「過耳過眼」，將解脫的種子種入心中，都屬於受教的範圍。<br>2. 發心： 在這裡特指「生起決定性的信心」。也就是斷除內心的疑慮，對往生淨土建立起真實、不動搖的信願。<br><br>關鍵區別： 法然上人強調這兩者不必同時發生。一個人可以先「受教」（懂道理），但可能要經過一段時間的消化、碰撞，等待一個特定的機緣（觸緣），才能真正「發心」（斷疑生信）。<br>這個概念很有趣，它說明了為什麼有時候我們道理都懂，卻還沒有那種「完全安心」的感覺。"}, {"q": "在公案中，山僧向法然上人請教的核心問題是什麼？", "a": "他雖已了解淨土法門大意，但內心仍有疑慮，未能建立決定往生的信心。"}, {"q": "法然上人給予有疑惑的山僧什麼樣的建議？", "a": "他建議山僧應當祈求三寶之力冥冥中加被，以求疑根永斷、信心開發。"}, {"q": "聽了法然上人的話後，山僧採取了什麼行動？", "a": "他每日殷勤地在佛前禮拜祈求三寶加被。"}, {"q": "山僧看到上梁的奇觀後，心中產生了怎樣的類比與領悟？", "a": "他領悟到凡夫的巧思之力尚能如此，阿彌陀如來的力量決定更不可思議。"}, {"q": "山僧的信心是如何建立起來的？他想通了哪兩個對應的願望？", "a": "他想到自己有「願生之志」，而阿彌陀佛有「接引之誓」，一個願往、一個願接，必然能夠往生。"}, {"q": "當山僧對往生生起決定信心後，他內心的疑慮發生了什麼變化？", "a": "一切疑慮如風掃霜，頓斷無遺。"}, {"q": "山僧在建立決定信心、過了三年大安心的生活後，最終的結局是什麼？", "a": "他自在往生淨土，並伴隨諸多祥瑞的徵兆。"}, {"q": "作者從此公案中得到的第一個啟發是什麼？", "a": "世間與出世間的一切困難，都可以遙遙祈求三寶的聖力冥中加被。"}, {"q": "作者從公案得到的第二個啟發，關於受教與發心之間的時間關係是什麼？", "a": "受教與發心不但不必同時，現實中往往需要經歷一段漫長的碰撞、消化、吸收過程。"}, {"q": "為何說這個公案足以令一切弘法者感到安慰？", "a": "因為只要所弘內容正確，一切努力都不會白費，對方遲早會發心，可謂「功不唐捐」。"}, {"q": "大乘經中的流通文處常說，為人說一偈一句或抄寫經文即得功德，這說明了功德成立的關鍵是什麼？", "a": "功德在於「所作當下」便具足，而非取決於對方是否信受或流布多廣。"}, {"q": "此公案提醒弘法者，當面對頑硬的弘法對象時，應抱持何種心態？", "a": "不必心焦心急，只管種下解脫種子即可。"}];
     const TARGET_DATE = new Date("2025-12-16T20:00:00").getTime();
 
     let currentIndex = 0;
@@ -73,7 +68,12 @@
     function disableUnlock() {
         isUnlocked = false;
         if(isShowingAnswer) { isShowingAnswer = false; renderCard(); }
-        statusMsg.textContent = "🔒 尚未到解鎖時間，按鈕暫無功能。";
+        
+        const targetDate = new Date(TARGET_DATE);
+        const dateStr = targetDate.toLocaleDateString('zh-TW', {year: 'numeric', month: '2-digit', day: '2-digit'});
+        const timeStr = targetDate.toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'});
+
+        statusMsg.textContent = `🔒 尚未到解鎖時間 (${dateStr} ${timeStr})，按鈕暫無功能。`;
         updateButtonState();
     }
 
@@ -131,15 +131,11 @@
         }
     }
 
-    let debugTimeOverride = false;
-    function toggleDebug() {
-        debugTimeOverride = !debugTimeOverride;
-        if(debugTimeOverride) { enableUnlock(); statusMsg.textContent = "🔓 [測試模式] 強制解鎖"; } else { checkTime(); }
-    }
-
     checkTime();
     renderCard();
-    setInterval(() => { if(!debugTimeOverride) checkTime(); }, 60000);
+    
+    setInterval(checkTime, 60000);
+
     document.addEventListener('keydown', (e) => {
         if(e.key === "ArrowRight") nextCard();
         if(e.key === "ArrowLeft") prevCard();
@@ -147,3 +143,4 @@
 </script>
 </body>
 </html>
+
