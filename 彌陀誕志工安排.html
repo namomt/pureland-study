@@ -3,316 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>法會悅眾職事表 - 閱讀模式</title>
+    <title>法會悅眾職事表</title>
     <style>
         :root {
-            /* 閱讀模式配色：柔和米黃底 + 深灰字 */
-            --bg-color: #F9F7F1;     /* 護眼米色背景 */
-            --card-bg: #FFFFFF;      /* 卡片白底 */
-            --text-main: #2c3e50;    /* 主要文字深灰 */
-            --text-label: #7f8c8d;   /* 標籤文字淺灰 */
-            --accent: #8e44ad;       /* 紫色強調色(莊嚴感) */
-            --note-bg: #fffbf0;      /* 備註底色 */
+            --bg-color: #222;       /* 深色背景 */
+            --card-bg: #333;        /* 卡片深灰底 */
+            --text-main: #eee;      /* 主要文字淺灰 */
+            --text-label: #aaa;     /* 標籤文字 */
+            --accent: #9b59b6;      /* 紫色標題 */
+            --highlight: #f1c40f;   /* 黃色重點 */
+            --btn-bg: #444;         /* 按鈕背景 */
+            --base-size: 20px;      /* 基準字體大小 */
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, "Microsoft JhengHei", "微軟正黑體", sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 15px;
-            /* 預設大字體，因為鎖定縮放，必須確保直接閱讀無障礙 */
-            font-size: 20px; 
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
+            padding: 0; /* 為了控制列，先歸零 */
+            font-size: var(--base-size);
+            line-height: 1.6;
+            padding-bottom: 50px;
         }
 
-        .reader-container {
-            max-width: 650px; /* 限制最大寬度，模擬書本頁面 */
+        /* --- 字體控制面板 (置頂固定) --- */
+        .controls {
+            position: sticky;
+            top: 0;
+            background-color: #1a1a1a;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border-bottom: 1px solid #444;
+        }
+
+        .btn {
+            background-color: var(--btn-bg);
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .btn:active { background-color: var(--accent); }
+
+        /* --- 內容容器 --- */
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            background-color: var(--card-bg);
-            padding: 25px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 輕微陰影增加層次感 */
+            padding: 20px;
         }
 
         h1 {
             text-align: center;
-            font-size: 1.5em;
             color: var(--accent);
-            margin: 0 0 30px 0;
-            border-bottom: 2px solid #eee;
+            margin-top: 10px;
+            border-bottom: 1px solid #555;
             padding-bottom: 15px;
-            font-weight: 700;
         }
 
-        /* 章節標題設計 */
         h2 {
-            font-size: 1.2em;
-            color: #fff;
             background-color: var(--accent);
-            padding: 10px 15px;
-            margin: 40px -20px 20px -20px; /* 讓標題區塊向左右延伸到底 */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-top: 30px;
+            font-size: 1.1em;
         }
 
-        /* 列表式排版 (比表格更適合閱讀模式) */
-        .role-row {
+        /* 列表樣式 */
+        .row {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            border-bottom: 1px solid #f0f0f0;
-            padding: 12px 0;
+            border-bottom: 1px solid #444;
+            padding: 12px 5px;
         }
 
-        .role-row:last-child {
-            border-bottom: none;
-        }
-
-        .role-title {
+        .label {
             color: var(--text-label);
             font-weight: bold;
-            font-size: 0.9em;
             flex-shrink: 0;
-            width: 3.5em; /* 固定標題寬度 */
+            width: 4em;
         }
 
-        .role-name {
+        .content {
             text-align: right;
-            font-weight: 500;
             flex-grow: 1;
-            padding-left: 15px;
         }
 
-        /* 備註與重點樣式 */
-        .highlight-note {
+        .highlight {
             display: block;
-            color: #c0392b;
-            font-size: 0.85em;
+            color: var(--highlight);
+            font-size: 0.9em;
             margin-top: 4px;
         }
 
-        .note-card {
-            background-color: var(--note-bg);
-            border: 1px dashed #e0c9a6;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 25px;
-            font-size: 0.95em;
-        }
-
-        .note-header {
-            font-weight: bold;
-            color: #d35400;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .info-group {
-            background-color: #fafafa;
-            border-radius: 8px;
+        /* 備註區塊 */
+        .note-box {
+            background-color: #444;
+            border-left: 5px solid var(--highlight);
             padding: 15px;
             margin-top: 20px;
+            border-radius: 0 5px 5px 0;
         }
-        
-        /* 針對多行內容的調整 */
-        .multiline {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+
+        .note-title {
+            color: var(--highlight);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
         }
+
+        ul { margin: 0; padding-left: 20px; }
+        li { margin-bottom: 5px; }
+
+        .group-section {
+            background-color: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
     </style>
 </head>
 <body>
 
-<div class="reader-container">
+<div class="controls">
+    <button class="btn" onclick="adjustFont(-2)">A-</button>
+    <button class="btn" onclick="resetFont()">重置</button>
+    <button class="btn" onclick="adjustFont(2)">A+</button>
+</div>
+
+<div class="container" id="contentArea">
     <h1>法會悅眾職事表</h1>
 
     <h2>上午場次</h2>
-    
-    <div class="role-row">
-        <span class="role-title">維那</span>
-        [cite_start]<span class="role-name">淨易 [cite: 2]</span>
+    <div class="row"><span class="label">維那</span><span class="content">淨易</span></div>
+    <div class="row"><span class="label">木魚</span><span class="content">淨諦</span></div>
+    <div class="row"><span class="label">鐺子</span><span class="content">和淨</span></div>
+    <div class="row"><span class="label">珂子</span><span class="content">淨寶</span></div>
+    <div class="row"><span class="label">寶鐘鼓</span><span class="content">淨心</span></div>
+    <div class="row"><span class="label">司儀</span><span class="content">淨耕</span></div>
+    <div class="row"><span class="label">引禮</span><span class="content">西：行淨<br>東：淨慈</span></div>
+    <div class="row"><span class="label">迎賓</span><span class="content">賴寶淨、壽淨<br>鄭寶淨、黃淙賢</span></div>
+    <div class="row">
+        <span class="label">知賓</span>
+        <span class="content">善淨、信淨<br><span class="highlight">(帶蓮友入座)</span></span>
     </div>
-    <div class="role-row">
-        <span class="role-title">木魚</span>
-        [cite_start]<span class="role-name">淨諦 [cite: 3]</span>
+    <div class="row"><span class="label">齋主</span><span class="content">東：淨誠<br>西：奉淨</span></div>
+    <div class="row">
+        <span class="label">護法</span>
+        <span class="content">張運登、羅世祥<br><span class="highlight">(舉牌-請關手機 保持安靜)</span></span>
     </div>
-    <div class="role-row">
-        <span class="role-title">鐺子</span>
-        [cite_start]<span class="role-name">和淨 [cite: 4]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">珂子</span>
-        [cite_start]<span class="role-name">淨寶 [cite: 5]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">寶鐘鼓</span>
-        [cite_start]<span class="role-name">淨心 [cite: 6]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">司儀</span>
-        [cite_start]<span class="role-name">淨耕 [cite: 7]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">引禮</span>
-        <div class="role-name multiline">
-            <span>西：行淨</span>
-            [cite_start]<span>東：淨慈 [cite: 8]</span>
-        </div>
-    </div>
-    <div class="role-row">
-        <span class="role-title">迎賓</span>
-        [cite_start]<span class="role-name">賴寶淨、壽淨<br>鄭寶淨、黃淙賢 [cite: 9]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">知賓</span>
-        <span class="role-name">
-            善淨、信淨
-            [cite_start]<span class="highlight-note">(帶蓮友入座) [cite: 10]</span>
-        </span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">齋主</span>
-        <div class="role-name multiline">
-            <span>東：淨誠</span>
-            [cite_start]<span>西：奉淨 [cite: 11]</span>
-        </div>
-    </div>
-    <div class="role-row">
-        <span class="role-title">護法</span>
-        <span class="role-name">
-            張運登、羅世祥
-            [cite_start]<span class="highlight-note">(舉牌-請關手機 保持安靜) [cite: 12]</span>
-        </span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">侍者</span>
-        [cite_start]<span class="role-name">文淨 [cite: 13]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">攝影</span>
-        [cite_start]<span class="role-name">淨香 [cite: 14]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">櫃台</span>
-        [cite_start]<span class="role-name">淨光、名淨 [cite: 15]</span>
+    <div class="row"><span class="label">侍者</span><span class="content">文淨</span></div>
+    <div class="row"><span class="label">攝影</span><span class="content">淨香</span></div>
+    <div class="row"><span class="label">櫃台</span><span class="content">淨光、名淨</span></div>
+
+    <div class="group-section">
+        <div class="row"><span class="label">用餐引導</span><span class="content">悅淨、淨願、陳美、迴淨</span></div>
+        <div class="row"><span class="label">禮品組</span><span class="content">如淨、淨元、林登興、陳秀花</span></div>
+        <div class="row"><span class="label">機動環保</span><span class="content">如淨、淨元、林登興、陳秀花<br>品淨、賴寶淨、壽淨<br>鄭寶淨、黃淙賢</span></div>
     </div>
 
-    <div class="info-group">
-        <div class="role-row">
-            <span class="role-title">用餐<br>引導</span>
-            [cite_start]<span class="role-name">悅淨、淨願、陳美、迴淨 [cite: 19]</span>
-        </div>
-        <div class="role-row">
-            <span class="role-title">禮品組</span>
-            [cite_start]<span class="role-name">如淨、淨元、林登興、陳秀花 [cite: 20]</span>
-        </div>
-        <div class="role-row">
-            <span class="role-title">機動<br>環保</span>
-            [cite_start]<span class="role-name">如淨、淨元、林登興、陳秀花、品淨、賴寶淨、壽淨、鄭寶淨、黃淙賢 [cite: 21]</span>
-        </div>
+    <div class="note-box">
+        <span class="note-title">📢 上午備註</span>
+        <ul>
+            <li>法師回向完：發結緣品時播放《彌陀牽著我的手》</li>
+            <li>大眾結緣品：平安米、壽桃、麵線、彌陀燈</li>
+        </ul>
     </div>
-
-    <div class="note-card">
-        <span class="note-header">📢 上午注意事項</span>
-        [cite_start]▪ <strong>法師回向完：</strong>發結緣品時播放《彌陀牽著我的手》。 [cite: 16]<br>
-        [cite_start]▪ <strong>大眾結緣品：</strong>平安米、壽桃、麵線、彌陀燈。 [cite: 18]
-    </div>
-
 
     <h2>下午場次</h2>
+    <div class="row"><span class="label">維那</span><span class="content">淨耕</span></div>
+    <div class="row"><span class="label">木魚</span><span class="content">淨元</span></div>
+    <div class="row"><span class="label">鐺子</span><span class="content">信淨</span></div>
+    <div class="row"><span class="label">珂子</span><span class="content">淨光</span></div>
+    <div class="row"><span class="label">寶鐘鼓</span><span class="content">淨心</span></div>
+    <div class="row"><span class="label">司儀</span><span class="content">(未填寫)</span></div>
+    <div class="row">
+        <span class="label">引禮</span>
+        <span class="content">西：文淨 <span class="highlight">(呼拜 起)</span><br>東：淨慈</span>
+    </div>
+    <div class="row">
+        <span class="label">迎賓</span>
+        <span class="content">賴寶淨、壽淨<br>鄭寶淨、黃淙賢<br><span class="highlight">(面帶笑容 協助下車蓮友)</span></span>
+    </div>
+    <div class="row">
+        <span class="label">知賓</span>
+        <span class="content">善淨、淨易、淨寶<br><span class="highlight">(發宗掛 帶位)</span></span>
+    </div>
+    <div class="row"><span class="label">齋主</span><span class="content">東：行淨<br>西：和淨</span></div>
+    <div class="row">
+        <span class="label">護法</span>
+        <span class="content">張運登、羅世祥<br><span class="highlight">(舉牌-請關手機 保持安靜)</span></span>
+    </div>
+    <div class="row"><span class="label">侍者</span><span class="content">奉淨</span></div>
+    <div class="row"><span class="label">攝影</span><span class="content">淨香</span></div>
+    <div class="row"><span class="label">櫃台</span><span class="content">名淨</span></div>
 
-    <div class="role-row">
-        <span class="role-title">維那</span>
-        [cite_start]<span class="role-name">淨耕 [cite: 23]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">木魚</span>
-        [cite_start]<span class="role-name">淨元 [cite: 24]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">鐺子</span>
-        [cite_start]<span class="role-name">信淨 [cite: 25]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">珂子</span>
-        [cite_start]<span class="role-name">淨光 [cite: 26]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">寶鐘鼓</span>
-        [cite_start]<span class="role-name">淨心 [cite: 27]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">引禮</span>
-        <span class="role-name">
-            西：文淨 <small>(呼拜 起)</small><br>
-            [cite_start]東：淨慈 [cite: 29]
-        </span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">迎賓</span>
-        <span class="role-name">
-            賴寶淨、壽淨、鄭寶淨、黃淙賢
-            [cite_start]<span class="highlight-note">(面帶笑容 協助下車蓮友) [cite: 30]</span>
-        </span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">知賓</span>
-        <span class="role-name">
-            善淨、淨易、淨寶
-            [cite_start]<span class="highlight-note">(發宗掛 帶位) [cite: 31]</span>
-        </span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">齋主</span>
-        <div class="role-name multiline">
-            <span>東：行淨</span>
-            [cite_start]<span>西：和淨 [cite: 32]</span>
-        </div>
-    </div>
-    <div class="role-row">
-        <span class="role-title">護法</span>
-        <span class="role-name">
-            張運登、羅世祥
-            [cite_start]<span class="highlight-note">(舉牌-請關手機 保持安靜) [cite: 33]</span>
-        </span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">侍者</span>
-        [cite_start]<span class="role-name">奉淨 [cite: 34]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">攝影</span>
-        [cite_start]<span class="role-name">淨香 [cite: 35]</span>
-    </div>
-    <div class="role-row">
-        <span class="role-title">櫃台</span>
-        [cite_start]<span class="role-name">名淨 [cite: 36]</span>
+    <div class="group-section">
+        <div class="row"><span class="label">禮品組</span><span class="content">善淨、淨易、淨寶<br>賴寶淨、壽淨<br>鄭寶淨、黃淙賢</span></div>
+        <div class="row"><span class="label">皈依結緣</span><span class="content">奉淨 / 淨寶</span></div>
     </div>
 
-    <div class="info-group">
-        <div class="role-row">
-            <span class="role-title">禮品組</span>
-            [cite_start]<span class="role-name">善淨、淨易、淨寶、賴寶淨、壽淨、鄭寶淨、黃淙賢 [cite: 37]</span>
-        </div>
-        <div class="role-row">
-            <span class="role-title">皈依<br>結緣</span>
-            [cite_start]<span class="role-name">奉淨 / 淨寶 [cite: 38]</span>
-        </div>
+    <div class="note-box">
+        <span class="note-title">🎁 下午結緣品</span>
+        <ul>
+            <li>皈依結緣品：《阿彌陀佛是怎樣一尊佛》、《略談三皈依》、佛牌、佛珠</li>
+            <li>大眾結緣品：手錶</li>
+        </ul>
     </div>
-
-    <div class="note-card">
-        <span class="note-header">🎁 下午結緣品</span>
-        [cite_start]▪ <strong>皈依：</strong>《阿彌陀佛是怎樣一尊佛》、《略談三皈依》、佛牌、佛珠。 [cite: 39]<br>
-        [cite_start]▪ <strong>大眾：</strong>手錶。 [cite: 41]
-    </div>
-
 </div>
+
+<script>
+    let currentSize = 20; // 預設字體大小
+
+    function adjustFont(amount) {
+        currentSize += amount;
+        if (currentSize < 14) currentSize = 14; // 最小限制
+        if (currentSize > 36) currentSize = 36; // 最大限制
+        document.body.style.fontSize = currentSize + "px";
+    }
+
+    function resetFont() {
+        currentSize = 20;
+        document.body.style.fontSize = "20px";
+    }
+</script>
 
 </body>
 </html>
