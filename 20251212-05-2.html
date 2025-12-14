@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>受教與發心</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
+        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; }
+        .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
+        #progress-indicator { font-size: 1.1rem; font-weight: bold; color: #5d4037; }
+        .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
+        .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
+        .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
+        .mode-q .content-text { font-size: 1.8rem; font-weight: bold; color: #2c3e50; }
+        .control-bar { flex-shrink: 0; padding: 20px; background-color: #fff; border-top: 1px solid #ddd; display: flex; justify-content: center; }
+        .toggle-btn { width: 100%; max-width: 400px; padding: 18px 0; border: none; border-radius: 12px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-show-answer { background-color: #27ae60; color: #fff; }
+        .btn-show-question { background-color: #2c3e50; color: #fff; }
+        .btn-locked { background-color: #ccc !important; color: #888 !important; cursor: not-allowed; box-shadow: none; }
+        #status-msg { text-align: center; font-size: 0.8rem; color: #aaa; padding-bottom: 5px; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
+        <span id="progress-indicator">1 / 1</span>
+        <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
+    </div>
+    <div class="card-container">
+        <div class="card mode-q" id="flashcard">
+            <div class="content-text" id="card-content">載入中...</div>
+        </div>
+    </div>
+    <div id="status-msg">檢查時間權限中...</div>
+    <div class="control-bar">
+        <button id="toggle-btn" class="toggle-btn btn-locked" onclick="toggleMode()">解答</button>
+    </div>
+
+<script>
+    const quizData = [{"q": "上人提倡念佛人要培養的「四平」心態是什麼？", "a": "平實、平凡、平易、平淡。"}, {"q": "為什麼說佛法沒有「創新」？", "a": "因為真理是永不改變的，永遠如此，所以亙古亙今，常舊常新。"}, {"q": "為什麼淨土法門沒有「單獨傳法」或秘法？", "a": "因為阿彌陀佛的法門如太陽光普照十方，是普度的法門，非專照一人的手電筒。"}, {"q": "文中用什麼比喻說明凡夫念佛時找不到「感覺」是正常的？", "a": "用「螞蟻坐在飛機上」的比喻，說明彌陀救度超越凡夫經驗範圍。"}, {"q": "許多人搞新鮮花樣、不願老實，其深層的心理動機是什麼？", "a": "名利心作怪，想要顯示自己比別人優勝。"}, {"q": "文中所說的信眾「造神」是什麼意思？", "a": "指信眾期望他們的師父是頂尖、有神通的完人，在這種心理下將師父神格化。"}, {"q": "文中用「太陽光底下，看不到蠟燭的光」做為比喻，說明什麼道理？", "a": "在阿彌陀佛的光明下，任何個人的「光」都顯不出來。"}, {"q": "《無量壽經》中說，聲聞、菩薩的光明在佛光面前有如什麼？", "a": "皆悉隱蔽，猶如聚墨。"}, {"q": "為什麼一些看似奇怪的儀式（如喝洗腳水）有時會顯得「靈驗」？", "a": "因為群眾的迷信和共同心力（萬法唯心），並非儀式本身，而是信眾自己創造出來的效果。"}, {"q": "對於祖師和上人沒有講過的個人想法，應該抱持什麼態度？", "a": "不要太自信，應按照規矩、套路來走才穩當。"}, {"q": "《宗風》中的「六不六化」強調了什麼原則？", "a": "強調「平凡化、平實化、平常化、信仰化、淺易化和普及化」。"}, {"q": "根據《宗風》，著作講演時必須依從什麼，絕不能做什麼？", "a": "必須依傳承，絕不妄自、越格發揮。"}, {"q": "為何淨土法門提倡「請法要簡單，不要繁瑣」？", "a": "因為此法門是阿彌陀佛的「不請之法」，且凡夫無德行，繁瑣儀式反而折福。"}];
+    const TARGET_DATE = new Date("2025-12-18T20:00:00").getTime();
+
+    let currentIndex = 0;
+    let isShowingAnswer = false; 
+    let isUnlocked = false;
+
+    const cardEl = document.getElementById('flashcard');
+    const contentEl = document.getElementById('card-content');
+    const progressEl = document.getElementById('progress-indicator');
+    const statusMsg = document.getElementById('status-msg');
+    const toggleBtn = document.getElementById('toggle-btn');
+
+    function checkTime() {
+        const now = new Date().getTime();
+        if (now >= TARGET_DATE) { enableUnlock(); } else { disableUnlock(); }
+    }
+
+    function enableUnlock() {
+        if(isUnlocked) return;
+        isUnlocked = true;
+        statusMsg.textContent = "🔓 時間已到，可以查看解答。";
+        updateButtonState();
+    }
+
+    function disableUnlock() {
+        isUnlocked = false;
+        if(isShowingAnswer) { isShowingAnswer = false; renderCard(); }
+        
+        const targetDate = new Date(TARGET_DATE);
+        const dateStr = targetDate.toLocaleDateString('zh-TW', {year: 'numeric', month: '2-digit', day: '2-digit'});
+        const timeStr = targetDate.toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'});
+
+        statusMsg.textContent = `🔒 尚未到解鎖時間 (${dateStr} ${timeStr})，按鈕暫無功能。`;
+        updateButtonState();
+    }
+
+    function renderCard() {
+        const item = quizData[currentIndex];
+        if (!isShowingAnswer) {
+            contentEl.innerHTML = item.q;
+            cardEl.className = "card mode-q";
+        } else {
+            contentEl.innerHTML = item.a;
+            cardEl.className = "card mode-a";
+        }
+        cardEl.scrollTop = 0;
+        progressEl.textContent = `${currentIndex + 1} / ${quizData.length}`;
+        updateButtonState();
+    }
+
+    function updateButtonState() {
+        if (!isUnlocked) {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-locked";
+            return;
+        }
+        toggleBtn.classList.remove("btn-locked");
+        if (isShowingAnswer) {
+            toggleBtn.textContent = "題目"; 
+            toggleBtn.className = "toggle-btn btn-show-question";
+        } else {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-show-answer";
+        }
+    }
+
+    function toggleMode() {
+        if (!isUnlocked) return;
+        isShowingAnswer = !isShowingAnswer;
+        renderCard();
+    }
+
+    function nextCard() {
+        if (currentIndex < quizData.length - 1) {
+            currentIndex++;
+            isShowingAnswer = false;
+            renderCard();
+        } else {
+            alert("已經是最後一題囉！");
+        }
+    }
+
+    function prevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            isShowingAnswer = false;
+            renderCard();
+        }
+    }
+
+    checkTime();
+    renderCard();
+    
+    setInterval(checkTime, 60000);
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowRight") nextCard();
+        if(e.key === "ArrowLeft") prevCard();
+    });
+</script>
+</body>
+</html>
