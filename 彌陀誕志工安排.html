@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>法會悅眾職事表</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #16a085;
+            --highlight-bg: #fff8e1;
+            --highlight-text: #c0392b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "微軟正黑體", "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 10px;
+            color: #333;
+            /* 設定基礎字體大小，適合手機閱讀，最小不低於12px */
+            font-size: 18px; 
+            -webkit-text-size-adjust: 100%; /* 防止 iOS 旋轉時字體忽大忽小 */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin: 10px 0 30px 0;
+            font-size: 1.6rem;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            background-color: #e8f6f3;
+            color: var(--accent-color);
+            padding: 12px;
+            border-left: 5px solid var(--accent-color);
+            margin-top: 40px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 15px 10px; /* 增加觸控友善的間距 */
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #fafafa;
+            width: 25%; /* 手機上標題欄窄一點 */
+            font-weight: bold;
+            color: #555;
+            white-space: nowrap; /* 防止職稱換行 */
+        }
+
+        /* 隔行變色，增加閱讀引導 */
+        tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        .note-box {
+            background-color: var(--highlight-bg);
+            border: 1px solid #ffe0b2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+
+        .note-title {
+            font-weight: bold;
+            color: #f57c00;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .sub-group {
+            margin-top: 20px;
+            border-top: 2px dashed #eee;
+            padding-top: 10px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: var(--highlight-text);
+            display: block; /* 在手機上讓備註換行顯示，比較整齊 */
+            margin-top: 4px;
+            font-size: 0.9em;
+        }
+
+        /* 針對小螢幕手機的特別調整 */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+                font-size: 16px; /* 小手機維持 16px，確保內容放得下 */
+            }
+            .container {
+                border-radius: 0;
+                padding: 15px;
+                box-shadow: none;
+            }
+            th {
+                width: 20%;
+                padding-right: 5px;
+            }
+            td {
+                padding-left: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>法會悅眾職事表</h1>
+
+    <h2>上午悅眾</h2>
+    <table>
+        <tr><th>維那</th><td>淨易</td></tr>
+        <tr><th>木魚</th><td>淨諦</td></tr>
+        <tr><th>鐺子</th><td>和淨</td></tr>
+        <tr><th>珂子</th><td>淨寶</td></tr>
+        <tr><th>寶鐘鼓</th><td>淨心</td></tr>
+        <tr><th>司儀</th><td>淨耕</td></tr>
+        <tr><th>引禮</th><td>西：行淨<br>東：淨慈</td></tr>
+        <tr><th>迎賓</th><td>賴寶淨、壽淨、鄭寶淨、黃淙賢</td></tr>
+        <tr><th>知賓</th><td>善淨、信淨 <span class="highlight">(帶蓮友入座)</span></td></tr>
+        <tr><th>齋主</th><td>東：淨誠<br>西：奉淨</td></tr>
+        <tr><th>護法</th><td>張運登、羅世祥 <span class="highlight">(舉牌-請關手機 保持安靜)</span></td></tr>
+        <tr><th>侍者</th><td>文淨</td></tr>
+        <tr><th>攝影</th><td>淨香</td></tr>
+        <tr><th>櫃台</th><td>淨光、名淨</td></tr>
+    </table>
+
+    <div class="sub-group">
+        <table>
+            <tr><th>用餐引導</th><td>悅淨、淨願、陳美、迴淨</td></tr>
+            <tr><th>禮品組</th><td>如淨、淨元、林登興、陳秀花</td></tr>
+            <tr><th>機動環保</th><td>如淨、淨元、林登興、陳秀花、品淨、賴寶淨、壽淨、鄭寶淨、黃淙賢</td></tr>
+        </table>
+    </div>
+
+    <div class="note-box">
+        <span class="note-title">📢 注意事項與結緣品</span>
+        <ul>
+            <li><strong>法師回向完：</strong>發結緣品時播放《彌陀牽著我的手》。</li>
+            <li><strong>大眾結緣品：</strong>平安米、壽桃、麵線、彌陀燈。</li>
+        </ul>
+    </div>
+
+    <h2>下午悅眾</h2>
+    <table>
+        <tr><th>維那</th><td>淨耕</td></tr>
+        <tr><th>木魚</th><td>淨元</td></tr>
+        <tr><th>鐺子</th><td>信淨</td></tr>
+        <tr><th>珂子</th><td>淨光</td></tr>
+        <tr><th>寶鐘鼓</th><td>淨心</td></tr>
+        <tr><th>司儀</th><td>(未填寫)</td></tr>
+        <tr><th>引禮</th><td>西：文淨 <span class="highlight">(呼拜 起)</span><br>東：淨慈</td></tr>
+        <tr><th>迎賓</th><td>賴寶淨、壽淨、鄭寶淨、黃淙賢 <span class="highlight">(面帶笑容 協助下車蓮友)</span></td></tr>
+        <tr><th>知賓</th><td>善淨、淨易、淨寶 <span class="highlight">(發宗掛 帶位)</span></td></tr>
+        <tr><th>齋主</th><td>東：行淨<br>西：和淨</td></tr>
+        <tr><th>護法</th><td>張運登、羅世祥 <span class="highlight">(舉牌-請關手機 保持安靜)</span></td></tr>
+        <tr><th>侍者</th><td>奉淨</td></tr>
+        <tr><th>攝影</th><td>淨香</td></tr>
+        <tr><th>櫃台</th><td>名淨</td></tr>
+    </table>
+
+    <div class="sub-group">
+        <table>
+            <tr><th>禮品組</th><td>善淨、淨易、淨寶、賴寶淨、壽淨、鄭寶淨、黃淙賢</td></tr>
+            <tr><th>皈依結緣</th><td>奉淨 / 淨寶</td></tr>
+        </table>
+    </div>
+
+    <div class="note-box">
+        <span class="note-title">🎁 結緣品資訊</span>
+        <ul>
+            <li><strong>皈依結緣品：</strong>《阿彌陀佛是怎樣一尊佛》、《略談三皈依》、佛牌、佛珠。</li>
+            <li><strong>大眾結緣品：</strong>手錶。</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
