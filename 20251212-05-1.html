@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>受教與發心</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
+        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; }
+        .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
+        #progress-indicator { font-size: 1.1rem; font-weight: bold; color: #5d4037; }
+        .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
+        .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
+        .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
+        .mode-q .content-text { font-size: 1.8rem; font-weight: bold; color: #2c3e50; }
+        .control-bar { flex-shrink: 0; padding: 20px; background-color: #fff; border-top: 1px solid #ddd; display: flex; justify-content: center; }
+        .toggle-btn { width: 100%; max-width: 400px; padding: 18px 0; border: none; border-radius: 12px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-show-answer { background-color: #27ae60; color: #fff; }
+        .btn-show-question { background-color: #2c3e50; color: #fff; }
+        .btn-locked { background-color: #ccc !important; color: #888 !important; cursor: not-allowed; box-shadow: none; }
+        #status-msg { text-align: center; font-size: 0.8rem; color: #aaa; padding-bottom: 5px; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
+        <span id="progress-indicator">1 / 1</span>
+        <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
+    </div>
+    <div class="card-container">
+        <div class="card mode-q" id="flashcard">
+            <div class="content-text" id="card-content">載入中...</div>
+        </div>
+    </div>
+    <div id="status-msg">檢查時間權限中...</div>
+    <div class="control-bar">
+        <button id="toggle-btn" class="toggle-btn btn-locked" onclick="toggleMode()">解答</button>
+    </div>
+
+<script>
+    const quizData = [{"q": "根據淨宗法師的開示，法義學習的四個要點是什麼？", "a": "一、法義學習的重要；二、法義學習的內容；三、法義學習的方法；四、法義學習的注意事項。"}, {"q": "為什麼說法義學習是永不過時的話題，再怎樣強調都不過分？", "a": "因為法義學習是整個佛教的根本，也是個人及眾生的法身慧命乃至彌陀生命之所繫。"}, {"q": "文中將什麼比喻為我們接受阿彌陀佛滋潤的「法乳」？", "a": "法義學習。"}, {"q": "若缺乏法義學習，會對「自信教人信」產生什麼影響？", "a": "會使其失去動力與來源。"}, {"q": "古代隋唐時期的寺院，相較於作法事，更盛行什麼活動？", "a": "盛行講法，如辨經、講解、著作等講學活動。"}, {"q": "淨土宗法義學習的內容主要來自哪些管道？", "a": "播經機/視頻、經書法本、淨土宗簡報、網站以及兩個微信公眾號。"}, {"q": "在學習資料中，微信公眾號的特點是什麼？", "a": "內容簡短、及時，讓人透過每天一小段的學習慢慢熏習而得到利益。"}, {"q": "《淨土宗簡報》的內容主要從何而來，其作用為何？", "a": "內容從微信和網站中精選抽列，作為兩個月來主要法義的總結，能代表一個方向。"}, {"q": "在個人自學中，提倡以什麼為主，什麼為輔？", "a": "提倡以聽播經機和看視頻為主，以閱讀文字資料為輔。"}, {"q": "個人自學若缺乏自制能力，容易產生什麼問題？", "a": "容易懈怠、厭倦、退墮。"}, {"q": "大眾組織學習中，主要提倡且經實踐證明非常有效的方式是什麼？", "a": "封閉式教學。學員報名後集中食宿，上交手機，萬緣放下，利用三至五天專心聽法與討論。"}, {"q": "文中用「_____」的比喻來說明平時零散學習效果不佳，信心難以安立。", "a": "燒開水"}, {"q": "經文中不用「學習」二字，而是強調「_____」是第一步。", "a": "聞"}, {"q": "為什麼即使知道「念佛必生」，仍要加強法義學習？", "a": "因為深入法義能保證安心、法喜、相續、不退地念佛，即「以解扶行」。"}, {"q": "學習者產生「我知道了，不用學了」的自滿心態，說明了什麼問題？", "a": "說明他根本沒有與法相應，因為真正相應者會像大海吞流，無止足情。"}, {"q": "經中說：「菩薩愛樂功德，如海吞流，_____。」", "a": "無止足情"}, {"q": "第三項注意事項「防止夾雜」強調了什麼學習原則？", "a": "必須一門深入，久久用功。"}, {"q": "什麼是「防止自作聰明」所要警惕的行為？", "a": "綜合各宗各派甚至世間學問，搞成一個大雜燴。"}, {"q": "為什麼要「防止自創新意」，並強調法門要單純、精純？", "a": "因為搞花樣的人心不老實，只有禍害自己，難有成就。"}, {"q": "文中用什麼自然現象比喻真理的恆常不變，不玩花樣？", "a": "太陽的東升西落與大海的潮起潮落。"}, {"q": "在「防止自我發揮」中，學習者被期許扮演什麼樣的角色？", "a": "做擴音器、答錄機、傳聲筒、影印機，忠實傳承祖師的教法。"}];
+    const TARGET_DATE = new Date("2025-12-16T20:00:00").getTime();
+
+    let currentIndex = 0;
+    let isShowingAnswer = false; 
+    let isUnlocked = false;
+
+    const cardEl = document.getElementById('flashcard');
+    const contentEl = document.getElementById('card-content');
+    const progressEl = document.getElementById('progress-indicator');
+    const statusMsg = document.getElementById('status-msg');
+    const toggleBtn = document.getElementById('toggle-btn');
+
+    function checkTime() {
+        const now = new Date().getTime();
+        if (now >= TARGET_DATE) { enableUnlock(); } else { disableUnlock(); }
+    }
+
+    function enableUnlock() {
+        if(isUnlocked) return;
+        isUnlocked = true;
+        statusMsg.textContent = "🔓 時間已到，可以查看解答。";
+        updateButtonState();
+    }
+
+    function disableUnlock() {
+        isUnlocked = false;
+        if(isShowingAnswer) { isShowingAnswer = false; renderCard(); }
+        
+        const targetDate = new Date(TARGET_DATE);
+        const dateStr = targetDate.toLocaleDateString('zh-TW', {year: 'numeric', month: '2-digit', day: '2-digit'});
+        const timeStr = targetDate.toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'});
+
+        statusMsg.textContent = `🔒 尚未到解鎖時間 (${dateStr} ${timeStr})，按鈕暫無功能。`;
+        updateButtonState();
+    }
+
+    function renderCard() {
+        const item = quizData[currentIndex];
+        if (!isShowingAnswer) {
+            contentEl.innerHTML = item.q;
+            cardEl.className = "card mode-q";
+        } else {
+            contentEl.innerHTML = item.a;
+            cardEl.className = "card mode-a";
+        }
+        cardEl.scrollTop = 0;
+        progressEl.textContent = `${currentIndex + 1} / ${quizData.length}`;
+        updateButtonState();
+    }
+
+    function updateButtonState() {
+        if (!isUnlocked) {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-locked";
+            return;
+        }
+        toggleBtn.classList.remove("btn-locked");
+        if (isShowingAnswer) {
+            toggleBtn.textContent = "題目"; 
+            toggleBtn.className = "toggle-btn btn-show-question";
+        } else {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-show-answer";
+        }
+    }
+
+    function toggleMode() {
+        if (!isUnlocked) return;
+        isShowingAnswer = !isShowingAnswer;
+        renderCard();
+    }
+
+    function nextCard() {
+        if (currentIndex < quizData.length - 1) {
+            currentIndex++;
+            isShowingAnswer = false;
+            renderCard();
+        } else {
+            alert("已經是最後一題囉！");
+        }
+    }
+
+    function prevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            isShowingAnswer = false;
+            renderCard();
+        }
+    }
+
+    checkTime();
+    renderCard();
+    
+    setInterval(checkTime, 60000);
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowRight") nextCard();
+        if(e.key === "ArrowLeft") prevCard();
+    });
+</script>
+</body>
+</html>
