@@ -8,7 +8,7 @@
   </title>
   <style>
    :root {
-            --base-font-size: 16px;
+            --base-font-size: 20px; /* 預設字體加大 */
             --nav-height: 55px;
             --primary-color: #5d4037;
         }
@@ -23,7 +23,7 @@
             color: #333;
         }
         
-        /* 懸浮工具列 */
+        /* 懸浮工具列 - Grid 佈局 */
         .navbar {
             position: fixed;
             top: 0;
@@ -33,23 +33,31 @@
             background-color: rgba(255, 255, 255, 0.98);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .nav-content {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* 左:彈性 中:自動 右:彈性 */
             align-items: center;
             padding: 0 10px;
+            box-sizing: border-box;
         }
         
-        .left-controls, .right-controls {
+        .nav-left {
+            justify-self: start;
             display: flex;
             gap: 5px;
-            align-items: center;
+        }
+        
+        .nav-center {
+            justify-self: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            white-space: nowrap; /* 防止標題換行 */
+        }
+
+        .nav-right {
+            justify-self: end;
+            display: flex;
+            gap: 5px;
         }
 
         .tool-btn {
@@ -66,14 +74,8 @@
         .tool-btn:hover { background: #e0e0e0; }
         .tool-btn:active { transform: scale(0.96); }
         .tool-btn.active { background-color: var(--primary-color); color: white; }
-        
-        .spacer {
-            width: 1px;
-            height: 18px;
-            background: #ddd;
-            margin: 0 4px;
-        }
 
+        /* 內容區塊 */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -82,13 +84,9 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            margin-top: 0;
+        /* 隱藏原本在內容裡的標題，因為已經移到 Navbar */
+        .container h1 {
+            display: none;
         }
         
         .course-list { list-style: none; padding: 0; }
@@ -128,36 +126,30 @@
             .course-link { flex-direction: column; align-items: flex-start; gap: 8px; }
             .date { align-self: flex-end; margin-left: 0; }
             .tool-btn { padding: 6px 10px; font-size: 0.85rem; } 
+            .nav-center { font-size: 1rem; } /* 手機上標題稍微縮小一點 */
         }
   </style>
  </head>
  <body>
   <div class="navbar">
-   <div class="nav-content">
-    <div class="left-controls">
-     <button class="tool-btn" id="btn-date-desc" onclick="sortList('date', 'desc')">
-      新
-     </button>
-     <button class="tool-btn" id="btn-date-asc" onclick="sortList('date', 'asc')">
-      舊
-     </button>
-    </div>
-    <div class="right-controls">
-     <button class="tool-btn" id="btn-badge-desc" onclick="sortList('badge', 'desc')">
-      號大
-     </button>
-     <button class="tool-btn" id="btn-badge-asc" onclick="sortList('badge', 'asc')">
-      號小
-     </button>
-     <div class="spacer">
-     </div>
-     <button class="tool-btn" onclick="changeFontSize(-2)">
-      小
-     </button>
-     <button class="tool-btn" onclick="changeFontSize(2)">
-      大
-     </button>
-    </div>
+   <div class="nav-left">
+    <button class="tool-btn" id="btn-new" onclick="sortList('desc')">
+     新
+    </button>
+    <button class="tool-btn" id="btn-old" onclick="sortList('asc')">
+     舊
+    </button>
+   </div>
+   <div class="nav-center">
+    淨土教理學習題庫
+   </div>
+   <div class="nav-right">
+    <button class="tool-btn" onclick="changeFontSize(-2)">
+     小
+    </button>
+    <button class="tool-btn" onclick="changeFontSize(2)">
+     大
+    </button>
    </div>
   </div>
   <div class="container">
@@ -243,51 +235,49 @@
    </ul>
   </div>
   <script id="app-script">
-   let currentSize = 16;
+   let currentSize = 20; /* 對應 CSS root 預設值 */
         
         function changeFontSize(delta) {
             currentSize += delta;
             if (currentSize < 14) currentSize = 14; 
-            if (currentSize > 28) currentSize = 28; 
+            if (currentSize > 32) currentSize = 32; 
             document.documentElement.style.setProperty('--base-font-size', currentSize + 'px');
         }
 
-        function sortList(type, order) {
+        function sortList(order) {
             const list = document.querySelector('.course-list');
             const items = Array.from(list.querySelectorAll('.course-item'));
             
             items.sort((a, b) => {
-                if (type === 'badge') {
-                    // 編號排序
-                    const valA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
-                    const valB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
-                    return (order === 'desc') ? (valB - valA) : (valA - valB);
+                // 依照 Badge 編號排序
+                const valA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
+                const valB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
+                
+                if (order === 'desc') {
+                    // 新 = 大 -> 小
+                    return valB - valA;
                 } else {
-                    // 日期排序
-                    const valA = a.querySelector('.date').textContent.trim();
-                    const valB = b.querySelector('.date').textContent.trim();
-                    return (order === 'desc') ? valB.localeCompare(valA) : valA.localeCompare(valB);
+                    // 舊 = 小 -> 大
+                    return valA - valB;
                 }
             });
 
             list.innerHTML = '';
             items.forEach(item => list.appendChild(item));
 
-            // 清除 active 狀態
+            // 更新按鈕狀態
             document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
             
-            // 設定新的 active
-            if (type === 'badge') {
-                if(order === 'desc') document.getElementById('btn-badge-desc').classList.add('active');
-                else document.getElementById('btn-badge-asc').classList.add('active');
+            if (order === 'desc') {
+                document.getElementById('btn-new').classList.add('active');
             } else {
-                if(order === 'desc') document.getElementById('btn-date-desc').classList.add('active');
-                else document.getElementById('btn-date-asc').classList.add('active');
+                document.getElementById('btn-old').classList.add('active');
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            sortList('badge', 'desc'); 
+            // 預設: 新 (編號大在上面)
+            sortList('desc'); 
         });
   </script>
  </body>
