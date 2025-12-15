@@ -72,6 +72,42 @@
             font-size: 0.8rem;
             margin-right: 10px;
         }
+   /* 排序按鈕樣式 */
+            .sort-controls {
+                text-align: right;
+                margin-bottom: 15px;
+            }
+            .sort-btn {
+                background-color: #e0e0e0;
+                border: none;
+                padding: 5px 12px;
+                border-radius: 15px;
+                cursor: pointer;
+                font-size: 0.85rem;
+                color: #555;
+                margin-left: 5px;
+                transition: background 0.2s;
+            }
+            .sort-btn:hover { background-color: #d5d5d5; }
+            .sort-btn.active { background-color: #bcaaa4; color: white; }
+   /* 排序按鈕樣式 */
+            .sort-controls {
+                text-align: right;
+                margin-bottom: 15px;
+            }
+            .sort-btn {
+                background-color: #e0e0e0;
+                border: none;
+                padding: 5px 12px;
+                border-radius: 15px;
+                cursor: pointer;
+                font-size: 0.85rem;
+                color: #555;
+                margin-left: 5px;
+                transition: background 0.2s;
+            }
+            .sort-btn:hover { background-color: #d5d5d5; }
+            .sort-btn.active { background-color: #bcaaa4; color: white; }
   </style>
  </head>
  <body>
@@ -79,19 +115,27 @@
    <h1>
     淨土教理學習題庫
    </h1>
+   <div class="sort-controls">
+    <button class="sort-btn" id="btn-desc" onclick="sortList('desc')">
+     日期 ↓
+    </button>
+    <button class="sort-btn" id="btn-asc" onclick="sortList('asc')">
+     日期 ↑
+    </button>
+   </div>
    <ul class="course-list">
     <li class="course-item">
-     <a class="course-link" href="20251205-04.html">
+     <a class="course-link" href="20251212-05-2.html">
       <div>
        <span class="badge">
-        01
+        03
        </span>
        <span class="title">
-        受教與發心
+        學法十二防-2
        </span>
       </div>
       <span class="date">
-       2025-12-05
+       2025-12-18
       </span>
      </a>
     </li>
@@ -111,21 +155,52 @@
      </a>
     </li>
     <li class="course-item">
-     <a class="course-link" href="20251212-05-2.html">
+     <a class="course-link" href="20251205-04.html">
       <div>
        <span class="badge">
-        03
+        01
        </span>
        <span class="title">
-        學法十二防-2
+        受教與發心
        </span>
       </div>
       <span class="date">
-       2025-12-18
+       2025-12-05
       </span>
      </a>
     </li>
    </ul>
   </div>
+  <script id="sort-script">
+   function sortList(order) {
+            const list = document.querySelector('.course-list');
+            const items = Array.from(list.querySelectorAll('.course-item'));
+            
+            items.sort((a, b) => {
+                const dateA = a.querySelector('.date').textContent.trim();
+                const dateB = b.querySelector('.date').textContent.trim();
+                // 比較日期
+                if (order === 'desc') {
+                    return dateB.localeCompare(dateA);
+                } else {
+                    return dateA.localeCompare(dateB);
+                }
+            });
+
+            // 清空並重新加入
+            list.innerHTML = '';
+            items.forEach(item => list.appendChild(item));
+
+            // 更新按鈕樣式
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            if(order === 'desc') document.getElementById('btn-desc').classList.add('active');
+            else document.getElementById('btn-asc').classList.add('active');
+        }
+
+        // 預設執行一次降序 (最新在上面)
+        document.addEventListener('DOMContentLoaded', () => {
+            sortList('desc'); 
+        });
+  </script>
  </body>
 </html>
