@@ -9,14 +9,13 @@
   <style>
    :root {
             --base-font-size: 16px;
-            --nav-height: 60px;
+            --nav-height: 55px;
             --primary-color: #5d4037;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
             background-color: #f5f5f5;
             margin: 0;
-            /* 關鍵：為了不被懸浮工具列擋住，內容要往下推 */
             padding-top: calc(var(--nav-height) + 20px); 
             padding-bottom: 20px;
             padding-left: 10px; padding-right: 10px;
@@ -24,7 +23,7 @@
             color: #333;
         }
         
-        /* 懸浮工具列樣式 */
+        /* 懸浮工具列 */
         .navbar {
             position: fixed;
             top: 0;
@@ -42,50 +41,51 @@
             width: 100%;
             max-width: 800px;
             display: flex;
-            justify-content: space-between; /* 左右分佈 */
+            justify-content: space-between; /* 關鍵：讓三個群組分開 */
             align-items: center;
-            padding: 0 15px;
-        }
-        .nav-title {
-            font-weight: bold;
-            color: var(--primary-color);
-            font-size: 1.1rem;
-            display: none; /* 手機版可能太窄，先隱藏，或顯示簡短標題 */
-        }
-        @media (min-width: 600px) { .nav-title { display: block; } }
-
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin: 0 auto; /* 置中 */
+            padding: 0 10px;
         }
         
+        .btn-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        /* 標籤文字 (例如：排序) - 可選 */
+        .group-label {
+            font-size: 0.75rem;
+            color: #999;
+            margin-right: 2px;
+            display: none; /* 手機空間不夠先隱藏 */
+        }
+
         .tool-btn {
             background: #f0f0f0;
             border: none;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 0.9rem;
+            border-radius: 6px; /* 方形圓角比較適合文字 */
+            padding: 6px 10px;
+            font-size: 0.85rem;
             color: #555;
             cursor: pointer;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            font-weight: bold;
         }
         .tool-btn:hover { background: #e0e0e0; }
         .tool-btn:active { transform: scale(0.96); }
         .tool-btn.active { background-color: var(--primary-color); color: white; }
         
-        .divider {
-            width: 1px;
-            height: 20px;
-            background-color: #ddd;
-            margin: 0 5px;
+        /* 針對 A+ A- 的圓形樣式保留 */
+        .font-btn {
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* 內容容器 */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -103,7 +103,6 @@
             margin-top: 0;
         }
         
-        /* 列表樣式 */
         .course-list { list-style: none; padding: 0; }
         .course-item { margin-bottom: 15px; }
         .course-link {
@@ -125,7 +124,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
-        
         .title { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
         .date { font-size: 0.85em; color: #999; margin-left: 10px; min-width: 80px; text-align: right; }
         .badge {
@@ -137,35 +135,39 @@
             margin-right: 10px;
         }
         
-        /* 手機版微調 */
         @media (max-width: 600px) {
             .container { padding: 20px; }
             .course-link { flex-direction: column; align-items: flex-start; gap: 8px; }
             .date { align-self: flex-end; margin-left: 0; }
-            .tool-btn { padding: 6px 10px; font-size: 0.85rem; } /* 按鈕稍微緊湊 */
+            .tool-btn { padding: 6px 8px; font-size: 0.8rem; } /* 手機按鈕縮小一點以防擠壓 */
         }
   </style>
  </head>
  <body>
   <div class="navbar">
    <div class="nav-content">
-    <div class="nav-title">
-     淨土教理
+    <div class="btn-group">
+     <button class="tool-btn" id="btn-date-desc" onclick="sortList('date', 'desc')">
+      最新
+     </button>
+     <button class="tool-btn" id="btn-date-asc" onclick="sortList('date', 'asc')">
+      最舊
+     </button>
     </div>
-    <div class="toolbar">
-     <button class="tool-btn" onclick="changeFontSize(-2)">
-      A-
+    <div class="btn-group">
+     <button class="tool-btn font-btn" onclick="changeFontSize(-2)">
+      小
      </button>
-     <button class="tool-btn" onclick="changeFontSize(2)">
-      A+
+     <button class="tool-btn font-btn" onclick="changeFontSize(2)">
+      大
      </button>
-     <div class="divider">
-     </div>
-     <button class="tool-btn" id="btn-desc" onclick="sortList('desc')">
-      ▼
+    </div>
+    <div class="btn-group">
+     <button class="tool-btn" id="btn-badge-desc" onclick="sortList('badge', 'desc')">
+      新
      </button>
-     <button class="tool-btn" id="btn-asc" onclick="sortList('asc')">
-      ▲
+     <button class="tool-btn" id="btn-badge-asc" onclick="sortList('badge', 'asc')">
+      舊
      </button>
     </div>
    </div>
@@ -262,31 +264,42 @@
             document.documentElement.style.setProperty('--base-font-size', currentSize + 'px');
         }
 
-        function sortList(order) {
+        function sortList(type, order) {
             const list = document.querySelector('.course-list');
             const items = Array.from(list.querySelectorAll('.course-item'));
             
             items.sort((a, b) => {
-                const badgeA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
-                const badgeB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
-                
-                if (order === 'desc') {
-                    return badgeB - badgeA;
+                if (type === 'badge') {
+                    // 編號排序
+                    const valA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
+                    const valB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
+                    return (order === 'desc') ? (valB - valA) : (valA - valB);
                 } else {
-                    return badgeA - badgeB;
+                    // 日期排序
+                    const valA = a.querySelector('.date').textContent.trim();
+                    const valB = b.querySelector('.date').textContent.trim();
+                    return (order === 'desc') ? valB.localeCompare(valA) : valA.localeCompare(valB);
                 }
             });
 
             list.innerHTML = '';
             items.forEach(item => list.appendChild(item));
 
+            // 更新按鈕狀態
             document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
-            if(order === 'desc') document.getElementById('btn-desc').classList.add('active');
-            else document.getElementById('btn-asc').classList.add('active');
+            
+            if (type === 'badge') {
+                if(order === 'desc') document.getElementById('btn-badge-desc').classList.add('active');
+                else document.getElementById('btn-badge-asc').classList.add('active');
+            } else {
+                if(order === 'desc') document.getElementById('btn-date-desc').classList.add('active');
+                else document.getElementById('btn-date-asc').classList.add('active');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            sortList('desc'); 
+            // 預設依編號大到小
+            sortList('badge', 'desc'); 
         });
   </script>
  </body>
