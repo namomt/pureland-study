@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>20251205-02-居士能做弘法的事嗎</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* 導覽列設定 */
+        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
+        
+        /* 上下一題按鈕 */
+        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; white-space: nowrap; }
+        .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
+        
+        /* 中間區域容器 */
+        .center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* 首頁按鈕 */
+        .home-btn { 
+            display: inline-block; 
+            text-decoration: none; 
+            background-color: #8d6e63; 
+            color: white; 
+            padding: 10px 30px; 
+            border-radius: 25px; 
+            font-size: 1.1rem; 
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s; 
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+        .home-btn:hover { background-color: #6d4c41; transform: translateY(-2px); }
+        .home-btn:active { transform: translateY(0); }
+
+        /* 進度文字 */
+        #progress-indicator { font-size: 0.85rem; color: #888; white-space: nowrap; }
+        
+        /* 卡片容器 */
+        .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; position: relative; }
+        
+        .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
+        .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
+        .mode-q .content-text { font-size: 1.8rem; font-weight: bold; color: #2c3e50; }
+        .control-bar { flex-shrink: 0; padding: 20px; background-color: #fff; border-top: 1px solid #ddd; display: flex; justify-content: center; }
+        .toggle-btn { width: 100%; max-width: 400px; padding: 18px 0; border: none; border-radius: 12px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-show-answer { background-color: #27ae60; color: #fff; }
+        .btn-show-question { background-color: #2c3e50; color: #fff; }
+        .btn-locked { background-color: #ccc !important; color: #888 !important; cursor: not-allowed; box-shadow: none; }
+        #status-msg { text-align: center; font-size: 0.8rem; color: #aaa; padding-bottom: 5px; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
+        <div class="center-group">
+            <a href="https://namomt.github.io/pureland-study/" class="home-btn">回首頁</a>
+            <span id="progress-indicator">1 / 1</span>
+        </div>
+        <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
+    </div>
+    
+    <div class="card-container" id="touch-area">
+        <div class="card mode-q" id="flashcard">
+            <div class="content-text" id="card-content">載入中...</div>
+        </div>
+    </div>
+    
+    <div id="status-msg">檢查時間權限中...</div>
+    <div class="control-bar">
+        <button id="toggle-btn" class="toggle-btn btn-locked" onclick="toggleMode()">解答</button>
+    </div>
+
+<script>
+    const quizData = [{"q": "根據文本，有些佛弟子指責在家居士弘法的理由是什麼？", "a": "他們認為居士只是護法，沒資格弘法利生，弘法是出家人的事。"}, {"q": "智隨法師如何定義「護法」與「弘法」之間的關係？", "a": "護法就是弘法，弘法也是護法，二者本質上是同一件事。"}, {"q": "善導大師的名言強調，將淨土法門的信仰傳授他人是為了什麼？", "a": "真正地報答佛恩（真成報佛恩）。<br>「自信教人信，難中轉更難；大悲傳普化，真成報佛恩。」"}, {"q": "文本中提到，其中一種需要深入理論研究的弘法形式是什麼？", "a": "講經說法，它能在理論上作正面引導。"}, {"q": "除了講經說法，另一種弘法形式是什麼？", "a": "實行，例如推廣念佛或輔助出家師父講經說法。"}, {"q": "輔助出家師父講經說法，這種配合性的工作既可稱為「弘法」，也可定位為「_____」。", "a": "護法"}, {"q": "根據文本，護法工作的核心圍繞著什麼？", "a": "圍繞「法」，只要能讓法推廣、流行、利益眾生都算在內。"}, {"q": "弘揚淨土法門的標準是看身分或修行好壞嗎？", "a": "不是，淨土法門是以信仰為標準。"}, {"q": "根據智隨法師的觀點，弘揚淨土法門的主要資格是什麼？", "a": "有正確的信仰。"}, {"q": "文本引用哪部佛經來證明在家居士也能扮演引導眾生的「善知識」角色？", "a": "《觀經》（佛說觀無量壽佛經）。"}, {"q": "在《觀經》的例子中，臨終時遇到善知識的是哪一類眾生？", "a": "下品下生的五逆眾生。"}, {"q": "根據《觀經》引文，善知識對臨終的五逆眾生最初的教導是什麼？", "a": "教令念佛。（意念）"}, {"q": "為何《觀經》中的五逆眾生無法遵從善知識最初的「念佛」教導？", "a": "因為他被劇烈的痛苦所逼迫（彼人苦逼，不惶念佛）。"}, {"q": "當臨終者無法「念佛」時，善知識提供了什麼替代方法？", "a": "應稱無量壽佛。（口稱佛號）"}, {"q": "根據《觀經》，五逆眾生最終以至心稱念了哪句佛號具足十念？", "a": "南無阿彌陀佛。"}, {"q": "五逆眾生在臨終時具足十念稱「南無阿彌陀佛」後，得到了什麼結果？", "a": "如一念頃，即得往生極樂世界。"}, {"q": "《觀經》中善知識勸人念佛的行為，在本質上被定義為什麼？", "a": "弘法。"}, {"q": "從《觀經》的例子可以得出什麼結論，關於成為善知識的資格？", "a": "身分不重要，重要的是能引導別人對淨土法門產生信心。"}];
+    const TARGET_DATE = new Date("2025-12-16T09:00:00").getTime();
+
+    let currentIndex = 0;
+    let isShowingAnswer = false; 
+    let isUnlocked = false;
+
+    const cardEl = document.getElementById('flashcard');
+    const contentEl = document.getElementById('card-content');
+    const progressEl = document.getElementById('progress-indicator');
+    const statusMsg = document.getElementById('status-msg');
+    const toggleBtn = document.getElementById('toggle-btn');
+
+    function checkTime() {
+        const now = new Date().getTime();
+        if (now >= TARGET_DATE) { enableUnlock(); } else { disableUnlock(); }
+    }
+
+    function enableUnlock() {
+        if(isUnlocked) return;
+        isUnlocked = true;
+        statusMsg.textContent = "🔓 時間已到，可以查看解答。";
+        updateButtonState();
+    }
+
+    function disableUnlock() {
+        isUnlocked = false;
+        if(isShowingAnswer) { isShowingAnswer = false; renderCard(); }
+        
+        const targetDate = new Date(TARGET_DATE);
+        const dateStr = targetDate.toLocaleDateString('zh-TW', {year: 'numeric', month: '2-digit', day: '2-digit'});
+        const timeStr = targetDate.toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'});
+
+        statusMsg.textContent = `🔒 尚未到解鎖時間 (${dateStr} ${timeStr})，按鈕暫無功能。`;
+        updateButtonState();
+    }
+
+    function renderCard() {
+        const item = quizData[currentIndex];
+        if (!isShowingAnswer) {
+            contentEl.innerHTML = item.q;
+            cardEl.className = "card mode-q";
+        } else {
+            contentEl.innerHTML = item.a;
+            cardEl.className = "card mode-a";
+        }
+        cardEl.scrollTop = 0;
+        progressEl.textContent = `${currentIndex + 1} / ${quizData.length}`;
+        updateButtonState();
+    }
+
+    function updateButtonState() {
+        if (!isUnlocked) {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-locked";
+            return;
+        }
+        toggleBtn.classList.remove("btn-locked");
+        if (isShowingAnswer) {
+            toggleBtn.textContent = "題目"; 
+            toggleBtn.className = "toggle-btn btn-show-question";
+        } else {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-show-answer";
+        }
+    }
+
+    function toggleMode() {
+        if (!isUnlocked) return;
+        isShowingAnswer = !isShowingAnswer;
+        renderCard();
+    }
+
+    function nextCard() {
+        if (currentIndex < quizData.length - 1) {
+            currentIndex++;
+            isShowingAnswer = false;
+            renderCard();
+        } else {
+            alert("已經是最後一題囉！");
+        }
+    }
+
+    function prevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            isShowingAnswer = false;
+            renderCard();
+        }
+    }
+
+    // --- 新增：手機觸控滑動支援 (Swipe Support) ---
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50; // 滑動門檻值 (像素)，滑超過這個距離才算
+    const touchArea = document.getElementById('touch-area');
+
+    touchArea.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    touchArea.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+        const distance = touchEndX - touchStartX;
+        
+        // 向左滑 (Swipe Left) -> 下一題 (距離為負)
+        if (distance < -minSwipeDistance) {
+            nextCard();
+        }
+        
+        // 向右滑 (Swipe Right) -> 上一題 (距離為正)
+        if (distance > minSwipeDistance) {
+            prevCard();
+        }
+    }
+
+    checkTime();
+    renderCard();
+    
+    setInterval(checkTime, 60000);
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowRight") nextCard();
+        if(e.key === "ArrowLeft") prevCard();
+    });
+</script>
+</body>
+</html>
