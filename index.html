@@ -41,31 +41,23 @@
             width: 100%;
             max-width: 800px;
             display: flex;
-            justify-content: space-between; /* 關鍵：讓三個群組分開 */
+            justify-content: space-between; /* 關鍵：左右分佈 */
             align-items: center;
             padding: 0 10px;
         }
         
-        .btn-group {
+        .left-controls, .right-controls {
             display: flex;
             gap: 5px;
             align-items: center;
         }
 
-        /* 標籤文字 (例如：排序) - 可選 */
-        .group-label {
-            font-size: 0.75rem;
-            color: #999;
-            margin-right: 2px;
-            display: none; /* 手機空間不夠先隱藏 */
-        }
-
         .tool-btn {
             background: #f0f0f0;
             border: none;
-            border-radius: 6px; /* 方形圓角比較適合文字 */
-            padding: 6px 10px;
-            font-size: 0.85rem;
+            border-radius: 6px;
+            padding: 8px 12px; /* 稍微加大按鈕範圍方便點擊 */
+            font-size: 0.9rem;
             color: #555;
             cursor: pointer;
             transition: all 0.2s;
@@ -75,15 +67,14 @@
         .tool-btn:active { transform: scale(0.96); }
         .tool-btn.active { background-color: var(--primary-color); color: white; }
         
-        /* 針對 A+ A- 的圓形樣式保留 */
-        .font-btn {
-            border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* 字體按鈕可以稍微圓一點或保持一致，這裡保持一致風格 */
+        
+        /* 分隔線 (右側群組內部分隔) */
+        .spacer {
+            width: 1px;
+            height: 18px;
+            background: #ddd;
+            margin: 0 4px;
         }
 
         .container {
@@ -139,35 +130,35 @@
             .container { padding: 20px; }
             .course-link { flex-direction: column; align-items: flex-start; gap: 8px; }
             .date { align-self: flex-end; margin-left: 0; }
-            .tool-btn { padding: 6px 8px; font-size: 0.8rem; } /* 手機按鈕縮小一點以防擠壓 */
+            .tool-btn { padding: 6px 10px; font-size: 0.85rem; } 
         }
   </style>
  </head>
  <body>
   <div class="navbar">
    <div class="nav-content">
-    <div class="btn-group">
+    <div class="left-controls">
      <button class="tool-btn" id="btn-date-desc" onclick="sortList('date', 'desc')">
-      最新
-     </button>
-     <button class="tool-btn" id="btn-date-asc" onclick="sortList('date', 'asc')">
-      最舊
-     </button>
-    </div>
-    <div class="btn-group">
-     <button class="tool-btn font-btn" onclick="changeFontSize(-2)">
-      小
-     </button>
-     <button class="tool-btn font-btn" onclick="changeFontSize(2)">
-      大
-     </button>
-    </div>
-    <div class="btn-group">
-     <button class="tool-btn" id="btn-badge-desc" onclick="sortList('badge', 'desc')">
       新
      </button>
-     <button class="tool-btn" id="btn-badge-asc" onclick="sortList('badge', 'asc')">
+     <button class="tool-btn" id="btn-date-asc" onclick="sortList('date', 'asc')">
       舊
+     </button>
+    </div>
+    <div class="right-controls">
+     <button class="tool-btn" id="btn-badge-desc" onclick="sortList('badge', 'desc')">
+      號大
+     </button>
+     <button class="tool-btn" id="btn-badge-asc" onclick="sortList('badge', 'asc')">
+      號小
+     </button>
+     <div class="spacer">
+     </div>
+     <button class="tool-btn" onclick="changeFontSize(-2)">
+      小
+     </button>
+     <button class="tool-btn" onclick="changeFontSize(2)">
+      大
      </button>
     </div>
    </div>
@@ -285,9 +276,10 @@
             list.innerHTML = '';
             items.forEach(item => list.appendChild(item));
 
-            // 更新按鈕狀態
+            // 清除 active 狀態
             document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
             
+            // 設定新的 active
             if (type === 'badge') {
                 if(order === 'desc') document.getElementById('btn-badge-desc').classList.add('active');
                 else document.getElementById('btn-badge-asc').classList.add('active');
