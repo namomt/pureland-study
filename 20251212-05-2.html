@@ -4,13 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>受教與發心</title>
+    <title>學法十二防-2</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
-        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; }
+        
+        /* 導覽列設定 */
+        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
+        
+        /* 上下一題按鈕 */
+        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; white-space: nowrap; }
         .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
-        #progress-indicator { font-size: 1.1rem; font-weight: bold; color: #5d4037; }
+        
+        /* 中間區域容器 (首頁按鈕 + 進度) */
+        .center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* 首頁按鈕 (大一點、置中) */
+        .home-btn { 
+            display: inline-block; 
+            text-decoration: none; 
+            background-color: #8d6e63; 
+            color: white; 
+            padding: 10px 30px; /* 加大內距 */
+            border-radius: 25px; 
+            font-size: 1.1rem; /* 加大字體 */
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s; 
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+        .home-btn:hover { background-color: #6d4c41; transform: translateY(-2px); }
+        .home-btn:active { transform: translateY(0); }
+
+        /* 進度文字 (縮小放在按鈕下方) */
+        #progress-indicator { font-size: 0.85rem; color: #888; white-space: nowrap; }
+        
         .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
         .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
         .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
@@ -26,9 +53,15 @@
 <body>
     <div class="nav-bar">
         <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
-        <span id="progress-indicator">1 / 1</span>
+        
+        <div class="center-group">
+            <a href="https://namomt.github.io/pureland-study/" class="home-btn">回首頁</a>
+            <span id="progress-indicator">1 / 1</span>
+        </div>
+        
         <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
     </div>
+    
     <div class="card-container">
         <div class="card mode-q" id="flashcard">
             <div class="content-text" id="card-content">載入中...</div>
@@ -41,7 +74,7 @@
 
 <script>
     const quizData = [{"q": "上人提倡念佛人要培養的「四平」心態是什麼？", "a": "平實、平凡、平易、平淡。"}, {"q": "為什麼說佛法沒有「創新」？", "a": "因為真理是永不改變的，永遠如此，所以亙古亙今，常舊常新。"}, {"q": "為什麼淨土法門沒有「單獨傳法」或秘法？", "a": "因為阿彌陀佛的法門如太陽光普照十方，是普度的法門，非專照一人的手電筒。"}, {"q": "文中用什麼比喻說明凡夫念佛時找不到「感覺」是正常的？", "a": "用「螞蟻坐在飛機上」的比喻，說明彌陀救度超越凡夫經驗範圍。"}, {"q": "許多人搞新鮮花樣、不願老實，其深層的心理動機是什麼？", "a": "名利心作怪，想要顯示自己比別人優勝。"}, {"q": "文中所說的信眾「造神」是什麼意思？", "a": "指信眾期望他們的師父是頂尖、有神通的完人，在這種心理下將師父神格化。"}, {"q": "文中用「太陽光底下，看不到蠟燭的光」做為比喻，說明什麼道理？", "a": "在阿彌陀佛的光明下，任何個人的「光」都顯不出來。"}, {"q": "《無量壽經》中說，聲聞、菩薩的光明在佛光面前有如什麼？", "a": "皆悉隱蔽，猶如聚墨。"}, {"q": "為什麼一些看似奇怪的儀式（如喝洗腳水）有時會顯得「靈驗」？", "a": "因為群眾的迷信和共同心力（萬法唯心），並非儀式本身，而是信眾自己創造出來的效果。"}, {"q": "對於祖師和上人沒有講過的個人想法，應該抱持什麼態度？", "a": "不要太自信，應按照規矩、套路來走才穩當。"}, {"q": "《宗風》中的「六不六化」強調了什麼原則？", "a": "強調「平凡化、平實化、平常化、信仰化、淺易化和普及化」。"}, {"q": "根據《宗風》，著作講演時必須依從什麼，絕不能做什麼？", "a": "必須依傳承，絕不妄自、越格發揮。"}, {"q": "為何淨土法門提倡「請法要簡單，不要繁瑣」？", "a": "因為此法門是阿彌陀佛的「不請之法」，且凡夫無德行，繁瑣儀式反而折福。"}];
-    const TARGET_DATE = new Date("2025-12-18T20:00:00").getTime();
+    const TARGET_DATE = new Date("2025-12-19T20:00:00").getTime();
 
     let currentIndex = 0;
     let isShowingAnswer = false; 

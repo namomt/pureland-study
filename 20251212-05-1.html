@@ -7,10 +7,37 @@
     <title>學法十二防-1</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
-        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; }
+        
+        /* 導覽列設定 */
+        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
+        
+        /* 上下一題按鈕 */
+        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; white-space: nowrap; }
         .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
-        #progress-indicator { font-size: 1.1rem; font-weight: bold; color: #5d4037; }
+        
+        /* 中間區域容器 (首頁按鈕 + 進度) */
+        .center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* 首頁按鈕 (大一點、置中) */
+        .home-btn { 
+            display: inline-block; 
+            text-decoration: none; 
+            background-color: #8d6e63; 
+            color: white; 
+            padding: 10px 30px; /* 加大內距 */
+            border-radius: 25px; 
+            font-size: 1.1rem; /* 加大字體 */
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s; 
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+        .home-btn:hover { background-color: #6d4c41; transform: translateY(-2px); }
+        .home-btn:active { transform: translateY(0); }
+
+        /* 進度文字 (縮小放在按鈕下方) */
+        #progress-indicator { font-size: 0.85rem; color: #888; white-space: nowrap; }
+        
         .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
         .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
         .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
@@ -26,9 +53,15 @@
 <body>
     <div class="nav-bar">
         <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
-        <span id="progress-indicator">1 / 1</span>
+        
+        <div class="center-group">
+            <a href="https://namomt.github.io/pureland-study/" class="home-btn">回首頁</a>
+            <span id="progress-indicator">1 / 1</span>
+        </div>
+        
         <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
     </div>
+    
     <div class="card-container">
         <div class="card mode-q" id="flashcard">
             <div class="content-text" id="card-content">載入中...</div>
