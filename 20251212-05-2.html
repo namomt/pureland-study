@@ -15,18 +15,18 @@
         .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; white-space: nowrap; }
         .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
         
-        /* 中間區域容器 (首頁按鈕 + 進度) */
+        /* 中間區域容器 */
         .center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        /* 首頁按鈕 (大一點、置中) */
+        /* 首頁按鈕 */
         .home-btn { 
             display: inline-block; 
             text-decoration: none; 
             background-color: #8d6e63; 
             color: white; 
-            padding: 10px 30px; /* 加大內距 */
+            padding: 10px 30px; 
             border-radius: 25px; 
-            font-size: 1.1rem; /* 加大字體 */
+            font-size: 1.1rem; 
             font-weight: bold;
             transition: background 0.3s, transform 0.2s; 
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -35,10 +35,12 @@
         .home-btn:hover { background-color: #6d4c41; transform: translateY(-2px); }
         .home-btn:active { transform: translateY(0); }
 
-        /* 進度文字 (縮小放在按鈕下方) */
+        /* 進度文字 */
         #progress-indicator { font-size: 0.85rem; color: #888; white-space: nowrap; }
         
-        .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
+        /* 卡片容器 */
+        .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; position: relative; }
+        
         .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
         .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
         .mode-q .content-text { font-size: 1.8rem; font-weight: bold; color: #2c3e50; }
@@ -53,20 +55,19 @@
 <body>
     <div class="nav-bar">
         <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
-        
         <div class="center-group">
             <a href="https://namomt.github.io/pureland-study/" class="home-btn">回首頁</a>
             <span id="progress-indicator">1 / 1</span>
         </div>
-        
         <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
     </div>
     
-    <div class="card-container">
+    <div class="card-container" id="touch-area">
         <div class="card mode-q" id="flashcard">
             <div class="content-text" id="card-content">載入中...</div>
         </div>
     </div>
+    
     <div id="status-msg">檢查時間權限中...</div>
     <div class="control-bar">
         <button id="toggle-btn" class="toggle-btn btn-locked" onclick="toggleMode()">解答</button>
@@ -161,6 +162,35 @@
             currentIndex--;
             isShowingAnswer = false;
             renderCard();
+        }
+    }
+
+    // --- 新增：手機觸控滑動支援 (Swipe Support) ---
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50; // 滑動門檻值 (像素)，滑超過這個距離才算
+    const touchArea = document.getElementById('touch-area');
+
+    touchArea.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    touchArea.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+        const distance = touchEndX - touchStartX;
+        
+        // 向左滑 (Swipe Left) -> 下一題 (距離為負)
+        if (distance < -minSwipeDistance) {
+            nextCard();
+        }
+        
+        // 向右滑 (Swipe Right) -> 上一題 (距離為正)
+        if (distance > minSwipeDistance) {
+            prevCard();
         }
     }
 
