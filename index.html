@@ -41,7 +41,7 @@
             width: 100%;
             max-width: 800px;
             display: flex;
-            justify-content: space-between; /* 左右分佈 */
+            justify-content: space-between;
             align-items: center;
             padding: 0 10px;
         }
@@ -67,6 +67,13 @@
         .tool-btn:active { transform: scale(0.96); }
         .tool-btn.active { background-color: var(--primary-color); color: white; }
         
+        .spacer {
+            width: 1px;
+            height: 18px;
+            background: #ddd;
+            margin: 0 4px;
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -128,14 +135,22 @@
   <div class="navbar">
    <div class="nav-content">
     <div class="left-controls">
-     <button class="tool-btn" id="btn-new" onclick="sortList('desc')">
+     <button class="tool-btn" id="btn-date-desc" onclick="sortList('date', 'desc')">
       新
      </button>
-     <button class="tool-btn" id="btn-old" onclick="sortList('asc')">
+     <button class="tool-btn" id="btn-date-asc" onclick="sortList('date', 'asc')">
       舊
      </button>
     </div>
     <div class="right-controls">
+     <button class="tool-btn" id="btn-badge-desc" onclick="sortList('badge', 'desc')">
+      號大
+     </button>
+     <button class="tool-btn" id="btn-badge-asc" onclick="sortList('badge', 'asc')">
+      號小
+     </button>
+     <div class="spacer">
+     </div>
      <button class="tool-btn" onclick="changeFontSize(-2)">
       小
      </button>
@@ -149,24 +164,6 @@
    <h1>
     淨土教理學習題庫
    </h1>
-   <div class="controls-bar">
-    <div class="ctrl-group">
-     <button class="icon-btn" onclick="changeFontSize(-2)" title="縮小字體">
-      A-
-     </button>
-     <button class="icon-btn" onclick="changeFontSize(2)" title="放大字體">
-      A+
-     </button>
-    </div>
-    <div class="ctrl-group">
-     <button class="icon-btn" id="btn-desc" onclick="sortList('desc')" title="編號由大到小">
-      ▼
-     </button>
-     <button class="icon-btn" id="btn-asc" onclick="sortList('asc')" title="編號由小到大">
-      ▲
-     </button>
-    </div>
-   </div>
    <ul class="course-list">
     <li class="course-item">
      <a class="course-link" href="20251212-05-2.html">
@@ -255,36 +252,42 @@
             document.documentElement.style.setProperty('--base-font-size', currentSize + 'px');
         }
 
-        function sortList(order) {
+        function sortList(type, order) {
             const list = document.querySelector('.course-list');
             const items = Array.from(list.querySelectorAll('.course-item'));
             
             items.sort((a, b) => {
-                // 依照 Badge 編號排序
-                const valA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
-                const valB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
-                
-                // order 'desc' (新) -> 數字大在前
-                if (order === 'desc') {
-                    return valB - valA;
+                if (type === 'badge') {
+                    // 編號排序
+                    const valA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
+                    const valB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
+                    return (order === 'desc') ? (valB - valA) : (valA - valB);
                 } else {
-                    return valA - valB;
+                    // 日期排序
+                    const valA = a.querySelector('.date').textContent.trim();
+                    const valB = b.querySelector('.date').textContent.trim();
+                    return (order === 'desc') ? valB.localeCompare(valA) : valA.localeCompare(valB);
                 }
             });
 
             list.innerHTML = '';
             items.forEach(item => list.appendChild(item));
 
-            // 更新按鈕狀態
-            document.querySelectorAll('.left-controls .tool-btn').forEach(btn => btn.classList.remove('active'));
+            // 清除 active 狀態
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
             
-            if(order === 'desc') document.getElementById('btn-new').classList.add('active');
-            else document.getElementById('btn-old').classList.add('active');
+            // 設定新的 active
+            if (type === 'badge') {
+                if(order === 'desc') document.getElementById('btn-badge-desc').classList.add('active');
+                else document.getElementById('btn-badge-asc').classList.add('active');
+            } else {
+                if(order === 'desc') document.getElementById('btn-date-desc').classList.add('active');
+                else document.getElementById('btn-date-asc').classList.add('active');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 預設依編號大到小 (新)
-            sortList('desc'); 
+            sortList('badge', 'desc'); 
         });
   </script>
  </body>
