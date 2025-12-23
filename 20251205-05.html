@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>20251212-05-學法十二防</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* 導覽列設定 */
+        .nav-bar { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; }
+        
+        /* 上下一題按鈕 */
+        .nav-btn { background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 1rem; cursor: pointer; color: #555; transition: all 0.2s; white-space: nowrap; }
+        .nav-btn:active { background-color: #e0e0e0; transform: scale(0.95); }
+        
+        /* 中間區域容器 */
+        .center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* 首頁按鈕 */
+        .home-btn { 
+            display: inline-block; 
+            text-decoration: none; 
+            background-color: #8d6e63; 
+            color: white; 
+            padding: 10px 30px; 
+            border-radius: 25px; 
+            font-size: 1.1rem; 
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s; 
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+        .home-btn:hover { background-color: #6d4c41; transform: translateY(-2px); }
+        .home-btn:active { transform: translateY(0); }
+
+        /* 進度文字 */
+        #progress-indicator { font-size: 0.85rem; color: #888; white-space: nowrap; }
+        
+        /* 卡片容器 */
+        .card-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; position: relative; }
+        
+        .card { background-color: #fff; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: calc(100vh - 180px); overflow-y: auto; display: flex; flex-direction: column; }
+        .content-text { margin: auto 0; padding: 40px; text-align: left; font-size: 1.6rem; line-height: 1.8; font-weight: normal; word-wrap: break-word; color: #333; }
+        .mode-q .content-text { font-size: 1.8rem; font-weight: bold; color: #2c3e50; }
+        .control-bar { flex-shrink: 0; padding: 20px; background-color: #fff; border-top: 1px solid #ddd; display: flex; justify-content: center; }
+        .toggle-btn { width: 100%; max-width: 400px; padding: 18px 0; border: none; border-radius: 12px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-show-answer { background-color: #27ae60; color: #fff; }
+        .btn-show-question { background-color: #2c3e50; color: #fff; }
+        .btn-locked { background-color: #ccc !important; color: #888 !important; cursor: not-allowed; box-shadow: none; }
+        #status-msg { text-align: center; font-size: 0.8rem; color: #aaa; padding-bottom: 5px; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <button class="nav-btn" onclick="prevCard()">❮ 上一題</button>
+        <div class="center-group">
+            <a href="https://namomt.github.io/pureland-study/" class="home-btn">回首頁</a>
+            <span id="progress-indicator">1 / 1</span>
+        </div>
+        <button class="nav-btn" onclick="nextCard()">下一題 ❯</button>
+    </div>
+    
+    <div class="card-container" id="touch-area">
+        <div class="card mode-q" id="flashcard">
+            <div class="content-text" id="card-content">載入中...</div>
+        </div>
+    </div>
+    
+    <div id="status-msg">檢查時間權限中...</div>
+    <div class="control-bar">
+        <button id="toggle-btn" class="toggle-btn btn-locked" onclick="toggleMode()">解答</button>
+    </div>
+
+<script>
+    const quizData = [{"q": "根據淨宗法師的開示，法義學習的四個要點是什麼？", "a": "一、法義學習的重要；二、法義學習的內容；三、法義學習的方法；四、法義學習的注意事項。"}, {"q": "淨宗法師將法義學習比喻為什麼，強調其對法身慧命的重要性？", "a": "比喻為接受阿彌陀佛的法乳滋潤，如同小孩子需要喝奶才能成長。"}, {"q": "根據文本，法義學習不僅是個人法乳的來源，也是什麼的本錢和基礎？", "a": "是「自信教人信」的本錢，以及淨土法門得以長久發展的基礎。"}, {"q": "淨宗法師提到，古代隋唐時期的寺院盛行什麼，與現代多作佛事、法事形成對比？", "a": "盛行講法，如辨經、講解、著作等講學之風。"}, {"q": "法師提到的法義學習內容中，除了經書法本和網站，還有哪三種管道？", "a": "播經機/視頻講座、《淨土宗簡報》和兩個微信公眾號（jingzong18、淨土宗弘願寺）。"}, {"q": "在學習資料中，哪一種被描述為「每天發，比較簡短、及時，而且潛移默化」？", "a": "微信公眾號。"}, {"q": "《淨土宗簡報》的內容主要從哪裡精選出來，代表著一種聲音和方向？", "a": "主要從微信和網站中抽列出來的精選內容。"}, {"q": "法義學習的方法大致分為哪兩類？", "a": "個人自學與大眾組織學習。"}, {"q": "在個人自學方面，法師提倡以_____為主，以_____為輔。", "a": "聽播經機和看視頻；閱讀文字資料"}, {"q": "淨宗法師提到一位只有小學四年級文化程度的法師，他聽《善導大師的淨土思想》多少遍以上，並因此弘法效果相當不錯？", "a": "聽過兩百遍以上。"}, {"q": "在大眾組織學習中，法師主要提倡哪種被證明非常有效的方式？", "a": "封閉式教學。"}, {"q": "封閉式教學的特點是什麼？", "a": "學員報名後集中食宿，上交手機，萬緣放下，利用三至五天專心聽法。"}, {"q": "淨宗法師用什麼比喻來說明零散學習效果不佳，而集中學習效果顯著？", "a": "用「燒開水」的比喻，零散學習像燒兩分鐘就拿走，永遠燒不開；集中學習則是一次燒開。"}, {"q": "文中提到，透過集中式學習，信眾能解決一輩子的問題，信心決定，這種學習方式如同給手機_____。", "a": "充電，要一次充滿才耐用"}, {"q": "法師強調學習主要靠聽聞，並引用經文中的哪個字來說明其重要性？", "a": "「聞」，如「如是我聞」、「聞其名號」等。"}, {"q": "注意事項(一)「防止懈倦」中提到，深入法義能保證念佛的哪四種狀態？", "a": "安心、法喜、相續、不退。"}, {"q": "注意事項(二)「防止自滿」中提到，學法相應的表現是「菩薩愛樂功德，如海吞流，_____」。", "a": "無止足情"}, {"q": "法師如何評論那些認為自己「知道了」就滿足，而去學別的法門的人？", "a": "這說明他根本就不相應，很快就要跑偏路、出差錯。"}, {"q": "注意事項(三)「防止夾雜」強調了什麼學習原則？", "a": "必須一門深入，久久用功。"}, {"q": "法師提到，要等你學到_____的程度，才能將其他學問化為淨土法門的營養。", "a": "萬法歸宗、一以貫之"}, {"q": "注意事項(四)「防止自作聰明」主要批評了哪種行為？", "a": "綜合各宗各派，加上世間學問，搞成一個大雜燴。"}, {"q": "注意事項(五)「防止自創新意」中，法師引用善導大師的話感歎什麼？", "a": "「專專指授歸西路，為他破壞還如故」，感歎眾生不老實，喜歡自己搞花樣。"}, {"q": "法師用什麼自然現象來比喻真理的恆常不變，不玩花樣？", "a": "太陽的東升西落和大海的潮起潮落。"}, {"q": "眾生為何喜歡玩花樣、不甘寂寞？", "a": "因為沒有找到真理，內心虛妄無常，需要變幻新奇來滿足。"}, {"q": "注意事項(六)「防止自我發揮」中，法師建議我們應該扮演什麼角色？", "a": "做擴音器、答錄機、傳聲筒，或影印機，只做複製傳承的工作。"}, {"q": "注意事項(七)「防止好奇」中提到，上人提倡念佛人要「四平」，指的是什麼？", "a": "平實、平凡、平易、平淡。"}, {"q": "法師用什麼比喻說明平淡才能持久？", "a": "像喝水一樣，淡水才是它本來的味道，才能持久；天天喝可樂不行。"}, {"q": "注意事項(八)「防止求新」中，法師如何解釋佛法「常舊常新」的道理？", "a": "真理永遠如此，所以亙古亙今；又因真理能從內心生出新的力量，所以常新，如同呼吸。"}, {"q": "上人曾對淨宗法師說：「_____不要怕重複，講一千遍、一萬遍都沒關係。」", "a": "好東西"}, {"q": "注意事項(九)「防止求玄求妙」，法師認為淨土法門最深妙的法是什麼？", "a": "善導大師講的「眾生稱念，必定往生」這八個字。"}, {"q": "法師如何解釋淨土法門是「太陽光的法門」，無法單獨傳法？", "a": "因為阿彌陀佛是無量光，普照十方眾生，無法像手電筒一樣只照一個人，所以沒有秘法或單獨傳授。"}, {"q": "注意事項(十)「防止求感應、求神通」中，法師用什麼比喻說明念佛人不需要找感覺？", "a": "用「螞蟻坐在飛機上」的比喻，說明凡夫無法感覺到六字名號這架大飛機的救度。"}, {"q": "法師認為，念佛時「沒有感覺」代表什麼？", "a": "沒有感覺就對了，因為阿彌陀佛的救度超越我們的經驗範圍。"}, {"q": "注意事項(十一)「防止名利」中指出，人搞新鮮花樣、表現自己，通常是什麼心在作怪？", "a": "名利心，特別是「名」心，想顯示自己比別人優勝。"}, {"q": "法師提醒，一旦成為法師或領眾，要特別注意防範什麼？", "a": "防名利、防吹捧。"}, {"q": "注意事項(十二)「防止造神，防止個人崇拜」中，「造神」的心理根源是什麼？", "a": "群眾希望他們的師父是頂尖的、有神通的，這是一種不老實的心理。"}, {"q": "《無量壽經》中，聲聞、菩薩的光明在遇到阿彌陀佛的光明時會如何？", "a": "「一切光明悉皆隱蔽」，猶如聚墨（像一塊黑木炭）。"}, {"q": "法師用「太陽光底下看不到_____的光」來比喻在彌陀光明下不應突出個人。", "a": "蠟燭"}, {"q": "注意事項(十三)「不要作怪、突出個人」中，法師如何解釋為何「師父的洗腳水能治病」這類現象會管用？", "a": "因為信眾的信心和群體的迷信心理，是「萬法唯心」的作用，並非師父本人真有神通。"}, {"q": "法師指出，當成千上萬人拜一棵樹時，樹就會靈驗，其背後的原因是什麼？", "a": "一方面可能有精靈附體，另一方面是眾生的心共同創造了一個「神」，這是一種異化。"}, {"q": "注意事項(十四)「不要太自信」提醒我們，對於_____沒有講過的想法，不要太自信。", "a": "祖師和上人"}, {"q": "《宗風》的「六不六化」中，「不尚體驗」對應的「化」是什麼？", "a": "平凡化。"}, {"q": "《宗風》的「六不六化」中，「不好玄奇」對應的「化」是什麼？", "a": "平實化。"}, {"q": "《宗風》的「六不六化」中，「不講學術」對應的「化」是什麼？", "a": "信仰化。"}, {"q": "上人說：「著作講演，必依_____，絕不妄自，越格發揮。」", "a": "傳承"}, {"q": "注意事項(十六)「嚴格按照傳承」中，強調寧願被人說老套無奇，也不可為了獲得喝彩而_____。", "a": "別出新章"}, {"q": "法師認為，法義是事關眾生法身慧命的大事，如同什麼一樣危險，不能玩花樣？", "a": "如同高空走鋼絲。"}, {"q": "注意事項(十七)「請法要簡單，不要繁瑣」中，法師提到淨土法門是阿彌陀佛的什麼法？", "a": "「不請之法」。"}, {"q": "為何淨土法門的行者請法儀式要簡單，不像聖道門那樣隆重？", "a": "因為淨土門行者是罪惡凡夫，沒有德行，繁瑣的儀式會損福報；而聖道門行者有深厚德行，需隆重儀式以顯尊重。"}, {"q": "法師認為，法義學習是佛教生存的_____，也是個人及眾生法身慧命乃至彌陀生命之所繫。", "a": "命脈"}];
+    const TARGET_DATE = new Date("2025-12-23T01:39:30").getTime();
+
+    let currentIndex = 0;
+    let isShowingAnswer = false; 
+    let isUnlocked = false;
+
+    const cardEl = document.getElementById('flashcard');
+    const contentEl = document.getElementById('card-content');
+    const progressEl = document.getElementById('progress-indicator');
+    const statusMsg = document.getElementById('status-msg');
+    const toggleBtn = document.getElementById('toggle-btn');
+
+    function checkTime() {
+        const now = new Date().getTime();
+        if (now >= TARGET_DATE) { enableUnlock(); } else { disableUnlock(); }
+    }
+
+    function enableUnlock() {
+        if(isUnlocked) return;
+        isUnlocked = true;
+        statusMsg.textContent = "🔓 時間已到，可以查看解答。";
+        updateButtonState();
+    }
+
+    function disableUnlock() {
+        isUnlocked = false;
+        if(isShowingAnswer) { isShowingAnswer = false; renderCard(); }
+        
+        const targetDate = new Date(TARGET_DATE);
+        const dateStr = targetDate.toLocaleDateString('zh-TW', {year: 'numeric', month: '2-digit', day: '2-digit'});
+        const timeStr = targetDate.toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'});
+
+        statusMsg.textContent = `🔒 尚未到解鎖時間 (${dateStr} ${timeStr})，按鈕暫無功能。`;
+        updateButtonState();
+    }
+
+    function renderCard() {
+        const item = quizData[currentIndex];
+        if (!isShowingAnswer) {
+            contentEl.innerHTML = item.q;
+            cardEl.className = "card mode-q";
+        } else {
+            contentEl.innerHTML = item.a;
+            cardEl.className = "card mode-a";
+        }
+        cardEl.scrollTop = 0;
+        progressEl.textContent = `${currentIndex + 1} / ${quizData.length}`;
+        updateButtonState();
+    }
+
+    function updateButtonState() {
+        if (!isUnlocked) {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-locked";
+            return;
+        }
+        toggleBtn.classList.remove("btn-locked");
+        if (isShowingAnswer) {
+            toggleBtn.textContent = "題目"; 
+            toggleBtn.className = "toggle-btn btn-show-question";
+        } else {
+            toggleBtn.textContent = "解答";
+            toggleBtn.className = "toggle-btn btn-show-answer";
+        }
+    }
+
+    function toggleMode() {
+        if (!isUnlocked) return;
+        isShowingAnswer = !isShowingAnswer;
+        renderCard();
+    }
+
+    function nextCard() {
+        if (currentIndex < quizData.length - 1) {
+            currentIndex++;
+            isShowingAnswer = false;
+            renderCard();
+        } else {
+            alert("已經是最後一題囉！");
+        }
+    }
+
+    function prevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            isShowingAnswer = false;
+            renderCard();
+        }
+    }
+
+    // --- 新增：手機觸控滑動支援 (Swipe Support) ---
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50; // 滑動門檻值 (像素)，滑超過這個距離才算
+    const touchArea = document.getElementById('touch-area');
+
+    touchArea.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    touchArea.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+        const distance = touchEndX - touchStartX;
+        
+        // 向左滑 (Swipe Left) -> 下一題 (距離為負)
+        if (distance < -minSwipeDistance) {
+            nextCard();
+        }
+        
+        // 向右滑 (Swipe Right) -> 上一題 (距離為正)
+        if (distance > minSwipeDistance) {
+            prevCard();
+        }
+    }
+
+    checkTime();
+    renderCard();
+    
+    setInterval(checkTime, 60000);
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowRight") nextCard();
+        if(e.key === "ArrowLeft") prevCard();
+    });
+</script>
+</body>
+</html>
