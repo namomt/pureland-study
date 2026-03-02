@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>受教與發心 - 問題閃卡</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #5d4037;
+            --secondary-color: #8d6e63;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --font-size-base: 24px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--background-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .lock-box {
+            background: var(--card-bg); padding: 40px 30px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+            max-width: 400px; width: 90%;
+        }
+        .lock-box input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc;
+            border-radius: 8px; font-size: 18px; box-sizing: border-box; text-align: center;
+        }
+        .lock-box button {
+            width: 100%; padding: 12px; background: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 18px;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .lock-box button:hover { background: var(--secondary-color); }
+        
+        #main-content { display: none; width: 100%; max-width: 800px; }
+        .container { width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary-color); font-size: 1.5em; margin: 0 0 10px 0; }
+        .progress-container {
+            width: 100%; height: 10px; background-color: #e0e0e0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background-color: var(--primary-color);
+            width: 0%; transition: width 0.3s ease;
+        }
+        .status-text { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .flashcard {
+            perspective: 1000px; width: 100%; min-height: 300px; cursor: pointer; margin-bottom: 30px;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d; min-height: 300px;
+        }
+        .flashcard.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background-color: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            transform: rotateY(180deg); background-color: #fafafa; border: 2px solid var(--primary-color);
+        }
+        .card-content { font-size: 1.2em; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+        .card-label {
+            position: absolute; top: 15px; left: 20px; font-size: 0.7em;
+            color: #999; text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        button.ctrl-btn {
+            padding: 12px 24px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        button.ctrl-btn:hover { background-color: var(--secondary-color); }
+        button.ctrl-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .size-controls button, .speak-btn {
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em;
+        }
+        .size-controls button:hover, .speak-btn:hover {
+            background-color: var(--primary-color); color: white;
+        }
+        @media (max-width: 600px) {
+            :root { --font-size-base: 20px; }
+            .controls { gap: 10px; }
+            button.ctrl-btn { padding: 10px 15px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="lock-screen">
+        <div class="lock-box">
+            <i class="fas fa-lock" style="font-size: 40px; color: #5d4037; margin-bottom: 20px;"></i>
+            <h2 style="color: #333; margin-bottom: 10px;">內容已上鎖</h2>
+            <p style="color: #666; font-size: 15px; margin-bottom: 20px;">
+                公開時間：<strong id="display-unlock-time">2025/12/05 0:00</strong><br>
+                時間未到前，請輸入密碼解鎖。
+            </p>
+            <input type="password" id="pwd-input" placeholder="請輸入密碼" onkeypress="handleEnter(event)">
+            <button onclick="verifyPassword()">解鎖內容</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="container">
+            <div class="top-controls">
+                <a href="index.html" style="text-decoration: none; color: var(--primary-color); font-size: 0.9em;">
+                    <i class="fas fa-arrow-left"></i> 回首頁
+                </a>
+                <div class="size-controls">
+                    <button onclick="changeFontSize(-2)">A-</button>
+                    <button onclick="changeFontSize(2)">A+</button>
+                </div>
+            </div>
+
+            <div class="header">
+                <h1>受教與發心</h1>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">載入中...</div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-label">問題</span>
+                        <button class="speak-btn" onclick="speakText(event, 'q')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="questionText"></div>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">答案</span>
+                        <button class="speak-btn" onclick="speakText(event, 'a')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="answerText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevCard()">
+                    <i class="fas fa-chevron-left"></i> 上一題
+                </button>
+                <button class="ctrl-btn" onclick="randomCard()">
+                    <i class="fas fa-random"></i> 隨機
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextCard()">
+                    下一題 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "1896";
+        const unlockTimeStr = "2025/12/05 0:00"; 
+        
+        function checkLock() {
+            if (!unlockTimeStr) return unlock(); 
+            
+            const unlockDate = new Date(unlockTimeStr).getTime();
+            const now = new Date().getTime();
+            
+            if (now >= unlockDate) {
+                unlock(); 
+            } else if (sessionStorage.getItem("unlocked_受教與發心") === "true") {
+                unlock(); 
+            }
+        }
+
+        function verifyPassword() {
+            const input = document.getElementById("pwd-input").value;
+            if (input === correctPassword || correctPassword === "") {
+                sessionStorage.setItem("unlocked_受教與發心", "true");
+                unlock();
+            } else {
+                alert("密碼錯誤，請重新輸入！");
+                document.getElementById("pwd-input").value = "";
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') verifyPassword();
+        }
+
+        function unlock() {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
+            initFlashcards(); 
+        }
+
+        const flashcards = [
+{ q: `根據法然上人對弟子勢觀的開示，「受教」與「發心」之間是什麼關係？`, a: `此二者不必同時發生，因為發心有時是因觸緣而發起的。` },
+{ q: `在公案中，山僧向法然上人請教的核心問題是什麼？`, a: `他雖已了解淨土法門大意，但內心仍有疑慮，未能建立決定往生的信心。` },
+{ q: `法然上人給予有疑惑的山僧什麼樣的建議？`, a: `他建議山僧應當祈求三寶之力冥冥中加被，以求疑根永斷、信心開發。` },
+{ q: `作者用什麼不太雅致的比喻來形容「建立信心」是自己的事？`, a: `如同上廁所，別人可以指路給紙，但最終還是得靠自己完成。` },
+{ q: `聽了法然上人的話後，山僧採取了什麼行動？`, a: `他每日殷勤地在佛前禮拜祈求三寶加被。` },
+{ q: `山僧是在日本哪座最有名的寺院見到奇觀而發心的？`, a: `東大寺。` },
+{ q: `在東大寺，是什麼具體事件觸發了山僧的信心？`, a: `他看到新建大殿上梁時，巨大的椽梁被眾人齊力拉上殿頂的景象。` },
+{ q: `山僧看到上梁的奇觀後，心中產生了怎樣的類比與領悟？`, a: `他領悟到凡夫的巧思之力尚能如此，阿彌陀如來的力量決定更不可思議。` },
+{ q: `山僧的信心是如何建立起來的？他想通了哪兩個對應的願望？`, a: `他想到自己有「願生之志」，而阿彌陀佛有「接引之誓」，一個願往、一個願接，必然能夠往生。` },
+{ q: `當山僧對往生生起決定信心後，他內心的疑慮發生了什麼變化？`, a: `一切疑慮如風掃霜，頓斷無遺。` },
+{ q: `山僧在建立決定信心、過了三年大安心的生活後，最終的結局是什麼？`, a: `他自在往生淨土，並伴隨諸多祥瑞的徵兆。` },
+{ q: `作者從此公案中得到的第一個啟發是什麼？`, a: `世間與出世間的一切困難，都可以遙遙祈求三寶的聖力冥中加被。` },
+{ q: `作者從公案得到的第二個啟發，關於受教與發心之間的時間關係是什麼？`, a: `受教與發心不但不必同時，現實中往往需要經歷一段漫長的碰撞、消化、吸收過程。` },
+{ q: `作者提到，只要將解脫的種子種到_____田中，便永為道種，絕無朽壞。`, a: `八識` },
+{ q: `文中用「_____」這個詞來形容只要種到八識田中的解脫種子，就決定會發芽結果。`, a: `金剛解脫種子` },
+{ q: `為何說這個公案足以令一切弘法者感到安慰？`, a: `因為只要所弘內容正確，一切努力都不會白費，對方遲早會發心，可謂「功不唐捐」。` },
+{ q: `根據作者的觀點，弘法者只要讓對方「過耳過眼」，根本上就已經達成了什麼？`, a: `受教。` },
+{ q: `大乘經中的流通文處常說，為人說一偈一句或抄寫經文即得功德，這說明了功德成立的關鍵是什麼？`, a: `功德在於「所作當下」便具足，而非取決於對方是否信受或流布多廣。` },
+{ q: `此公案提醒弘法者，當面對頑硬的弘法對象時，應抱持何種心態？`, a: `不必心焦心急，只管種下解脫種子即可。` }
+        ];
+
+        let currentCard = 0;
+        let isFlipped = false;
+        let currentFontSize = 24;
+
+        function initFlashcards() {
+            if(flashcards.length > 0) updateCard();
+        }
+
+        function updateCard() {
+            const card = flashcards[currentCard];
+            document.getElementById('questionText').innerHTML = card.q.replace(/\n/g, '<br>');
+            document.getElementById('answerText').innerHTML = card.a.replace(/\n/g, '<br>');
+            document.getElementById('statusText').textContent = `第 ${currentCard + 1} 題，共 ${flashcards.length} 題`;
+            
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === flashcards.length - 1;
+            
+            if (isFlipped) {
+                document.getElementById('flashcard').classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCard < flashcards.length - 1) {
+                currentCard++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                updateCard();
+            }
+        }
+
+        function randomCard() {
+            if (flashcards.length <= 1) return;
+            let newCard;
+            do {
+                newCard = Math.floor(Math.random() * flashcards.length);
+            } while (newCard === currentCard);
+            currentCard = newCard;
+            updateCard();
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 40) currentFontSize = 40;
+            document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+        }
+
+        function speakText(event, side) {
+            event.stopPropagation();
+            const textHTML = flashcards[currentCard][side];
+            const text = textHTML.replace(/<[^>]*>?/gm, ''); 
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器不支援語音朗讀功能");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkLock);
+    </script>
+</body>
+</html>

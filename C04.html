@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學法十二防 - 問題閃卡</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #5d4037;
+            --secondary-color: #8d6e63;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --font-size-base: 24px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--background-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .lock-box {
+            background: var(--card-bg); padding: 40px 30px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+            max-width: 400px; width: 90%;
+        }
+        .lock-box input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc;
+            border-radius: 8px; font-size: 18px; box-sizing: border-box; text-align: center;
+        }
+        .lock-box button {
+            width: 100%; padding: 12px; background: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 18px;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .lock-box button:hover { background: var(--secondary-color); }
+        
+        #main-content { display: none; width: 100%; max-width: 800px; }
+        .container { width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary-color); font-size: 1.5em; margin: 0 0 10px 0; }
+        .progress-container {
+            width: 100%; height: 10px; background-color: #e0e0e0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background-color: var(--primary-color);
+            width: 0%; transition: width 0.3s ease;
+        }
+        .status-text { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .flashcard {
+            perspective: 1000px; width: 100%; min-height: 300px; cursor: pointer; margin-bottom: 30px;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d; min-height: 300px;
+        }
+        .flashcard.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background-color: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            transform: rotateY(180deg); background-color: #fafafa; border: 2px solid var(--primary-color);
+        }
+        .card-content { font-size: 1.2em; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+        .card-label {
+            position: absolute; top: 15px; left: 20px; font-size: 0.7em;
+            color: #999; text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        button.ctrl-btn {
+            padding: 12px 24px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        button.ctrl-btn:hover { background-color: var(--secondary-color); }
+        button.ctrl-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .size-controls button, .speak-btn {
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em;
+        }
+        .size-controls button:hover, .speak-btn:hover {
+            background-color: var(--primary-color); color: white;
+        }
+        @media (max-width: 600px) {
+            :root { --font-size-base: 20px; }
+            .controls { gap: 10px; }
+            button.ctrl-btn { padding: 10px 15px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="lock-screen">
+        <div class="lock-box">
+            <i class="fas fa-lock" style="font-size: 40px; color: #5d4037; margin-bottom: 20px;"></i>
+            <h2 style="color: #333; margin-bottom: 10px;">內容已上鎖</h2>
+            <p style="color: #666; font-size: 15px; margin-bottom: 20px;">
+                公開時間：<strong id="display-unlock-time">2025/12/05 0:00</strong><br>
+                時間未到前，請輸入密碼解鎖。
+            </p>
+            <input type="password" id="pwd-input" placeholder="請輸入密碼" onkeypress="handleEnter(event)">
+            <button onclick="verifyPassword()">解鎖內容</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="container">
+            <div class="top-controls">
+                <a href="index.html" style="text-decoration: none; color: var(--primary-color); font-size: 0.9em;">
+                    <i class="fas fa-arrow-left"></i> 回首頁
+                </a>
+                <div class="size-controls">
+                    <button onclick="changeFontSize(-2)">A-</button>
+                    <button onclick="changeFontSize(2)">A+</button>
+                </div>
+            </div>
+
+            <div class="header">
+                <h1>學法十二防</h1>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">載入中...</div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-label">問題</span>
+                        <button class="speak-btn" onclick="speakText(event, 'q')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="questionText"></div>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">答案</span>
+                        <button class="speak-btn" onclick="speakText(event, 'a')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="answerText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevCard()">
+                    <i class="fas fa-chevron-left"></i> 上一題
+                </button>
+                <button class="ctrl-btn" onclick="randomCard()">
+                    <i class="fas fa-random"></i> 隨機
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextCard()">
+                    下一題 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "6146";
+        const unlockTimeStr = "2025/12/05 0:00"; 
+        
+        function checkLock() {
+            if (!unlockTimeStr) return unlock(); 
+            
+            const unlockDate = new Date(unlockTimeStr).getTime();
+            const now = new Date().getTime();
+            
+            if (now >= unlockDate) {
+                unlock(); 
+            } else if (sessionStorage.getItem("unlocked_學法十二防") === "true") {
+                unlock(); 
+            }
+        }
+
+        function verifyPassword() {
+            const input = document.getElementById("pwd-input").value;
+            if (input === correctPassword || correctPassword === "") {
+                sessionStorage.setItem("unlocked_學法十二防", "true");
+                unlock();
+            } else {
+                alert("密碼錯誤，請重新輸入！");
+                document.getElementById("pwd-input").value = "";
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') verifyPassword();
+        }
+
+        function unlock() {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
+            initFlashcards(); 
+        }
+
+        const flashcards = [
+{ q: `根據淨宗法師的開示，法義學習的四個要點是什麼？`, a: `一、法義學習的重要；二、法義學習的內容；三、法義學習的方法；四、法義學習的注意事項。` },
+{ q: `淨宗法師將法義學習比喻為什麼，強調其對法身慧命的重要性？`, a: `比喻為接受阿彌陀佛的法乳滋潤，如同小孩子需要喝奶才能成長。` },
+{ q: `根據文本，法義學習不僅是個人法乳的來源，也是什麼的本錢和基礎？`, a: `是「自信教人信」的本錢，以及淨土法門得以長久發展的基礎。` },
+{ q: `淨宗法師提到，古代隋唐時期的寺院盛行什麼，與現代多作佛事、法事形成對比？`, a: `盛行講法，如辨經、講解、著作等講學之風。` },
+{ q: `法師提到的法義學習內容中，除了經書法本和網站，還有哪三種管道？`, a: `播經機/視頻講座、《淨土宗簡報》和兩個微信公眾號（jingzong18、淨土宗弘願寺）。` },
+{ q: `在學習資料中，哪一種被描述為「每天發，比較簡短、及時，而且潛移默化」？`, a: `微信公眾號。` },
+{ q: `《淨土宗簡報》的內容主要從哪裡精選出來，代表著一種聲音和方向？`, a: `主要從微信和網站中抽列出來的精選內容。` },
+{ q: `法義學習的方法大致分為哪兩類？`, a: `個人自學與大眾組織學習。` },
+{ q: `在個人自學方面，法師提倡以_____為主，以_____為輔。`, a: `聽播經機和看視頻；閱讀文字資料` },
+{ q: `淨宗法師提到一位只有小學四年級文化程度的法師，他聽《善導大師的淨土思想》多少遍以上，並因此弘法效果相當不錯？`, a: `聽過兩百遍以上。` },
+{ q: `在大眾組織學習中，法師主要提倡哪種被證明非常有效的方式？`, a: `封閉式教學。` },
+{ q: `封閉式教學的特點是什麼？`, a: `學員報名後集中食宿，上交手機，萬緣放下，利用三至五天專心聽法。` },
+{ q: `淨宗法師用什麼比喻來說明零散學習效果不佳，而集中學習效果顯著？`, a: `用「燒開水」的比喻，零散學習像燒兩分鐘就拿走，永遠燒不開；集中學習則是一次燒開。` },
+{ q: `文中提到，透過集中式學習，信眾能解決一輩子的問題，信心決定，這種學習方式如同給手機_____。`, a: `充電，要一次充滿才耐用` },
+{ q: `法師強調學習主要靠聽聞，並引用經文中的哪個字來說明其重要性？`, a: `「聞」，如「如是我聞」、「聞其名號」等。` },
+{ q: `注意事項(一)「防止懈倦」中提到，深入法義能保證念佛的哪四種狀態？`, a: `安心、法喜、相續、不退。` },
+{ q: `注意事項(二)「防止自滿」中提到，學法相應的表現是「菩薩愛樂功德，如海吞流，_____」。`, a: `無止足情` },
+{ q: `法師如何評論那些認為自己「知道了」就滿足，而去學別的法門的人？`, a: `這說明他根本就不相應，很快就要跑偏路、出差錯。` },
+{ q: `注意事項(三)「防止夾雜」強調了什麼學習原則？`, a: `必須一門深入，久久用功。` },
+{ q: `法師提到，要等你學到_____的程度，才能將其他學問化為淨土法門的營養。`, a: `萬法歸宗、一以貫之` },
+{ q: `注意事項(四)「防止自作聰明」主要批評了哪種行為？`, a: `綜合各宗各派，加上世間學問，搞成一個大雜燴。` },
+{ q: `注意事項(五)「防止自創新意」中，法師引用善導大師的話感歎什麼？`, a: `「專專指授歸西路，為他破壞還如故」，感歎眾生不老實，喜歡自己搞花樣。` },
+{ q: `法師用什麼自然現象來比喻真理的恆常不變，不玩花樣？`, a: `太陽的東升西落和大海的潮起潮落。` },
+{ q: `眾生為何喜歡玩花樣、不甘寂寞？`, a: `因為沒有找到真理，內心虛妄無常，需要變幻新奇來滿足。` },
+{ q: `注意事項(六)「防止自我發揮」中，法師建議我們應該扮演什麼角色？`, a: `做擴音器、答錄機、傳聲筒，或影印機，只做複製傳承的工作。` },
+{ q: `注意事項(七)「防止好奇」中提到，上人提倡念佛人要「四平」，指的是什麼？`, a: `平實、平凡、平易、平淡。` },
+{ q: `法師用什麼比喻說明平淡才能持久？`, a: `像喝水一樣，淡水才是它本來的味道，才能持久；天天喝可樂不行。` },
+{ q: `注意事項(八)「防止求新」中，法師如何解釋佛法「常舊常新」的道理？`, a: `真理永遠如此，所以亙古亙今；又因真理能從內心生出新的力量，所以常新，如同呼吸。` },
+{ q: `上人曾對淨宗法師說：「_____不要怕重複，講一千遍、一萬遍都沒關係。」`, a: `好東西` },
+{ q: `注意事項(九)「防止求玄求妙」，法師認為淨土法門最深妙的法是什麼？`, a: `善導大師講的「眾生稱念，必定往生」這八個字。` },
+{ q: `法師如何解釋淨土法門是「太陽光的法門」，無法單獨傳法？`, a: `因為阿彌陀佛是無量光，普照十方眾生，無法像手電筒一樣只照一個人，所以沒有秘法或單獨傳授。` },
+{ q: `注意事項(十)「防止求感應、求神通」中，法師用什麼比喻說明念佛人不需要找感覺？`, a: `用「螞蟻坐在飛機上」的比喻，說明凡夫無法感覺到六字名號這架大飛機的救度。` },
+{ q: `法師認為，念佛時「沒有感覺」代表什麼？`, a: `沒有感覺就對了，因為阿彌陀佛的救度超越我們的經驗範圍。` },
+{ q: `注意事項(十一)「防止名利」中指出，人搞新鮮花樣、表現自己，通常是什麼心在作怪？`, a: `名利心，特別是「名」心，想顯示自己比別人優勝。` },
+{ q: `法師提醒，一旦成為法師或領眾，要特別注意防範什麼？`, a: `防名利、防吹捧。` },
+{ q: `注意事項(十二)「防止造神，防止個人崇拜」中，「造神」的心理根源是什麼？`, a: `群眾希望他們的師父是頂尖的、有神通的，這是一種不老實的心理。` },
+{ q: `《無量壽經》中，聲聞、菩薩的光明在遇到阿彌陀佛的光明時會如何？`, a: `「一切光明悉皆隱蔽」，猶如聚墨（像一塊黑木炭）。` },
+{ q: `法師用「太陽光底下看不到_____的光」來比喻在彌陀光明下不應突出個人。`, a: `蠟燭` },
+{ q: `注意事項(十三)「不要作怪、突出個人」中，法師如何解釋為何「師父的洗腳水能治病」這類現象會管用？`, a: `因為信眾的信心和群體的迷信心理，是「萬法唯心」的作用，並非師父本人真有神通。` },
+{ q: `法師指出，當成千上萬人拜一棵樹時，樹就會靈驗，其背後的原因是什麼？`, a: `一方面可能有精靈附體，另一方面是眾生的心共同創造了一個「神」，這是一種異化。` },
+{ q: `注意事項(十四)「不要太自信」提醒我們，對於_____沒有講過的想法，不要太自信。`, a: `祖師和上人` },
+{ q: `《宗風》的「六不六化」中，「不尚體驗」對應的「化」是什麼？`, a: `平凡化。` },
+{ q: `《宗風》的「六不六化」中，「不好玄奇」對應的「化」是什麼？`, a: `平實化。` },
+{ q: `《宗風》的「六不六化」中，「不講學術」對應的「化」是什麼？`, a: `信仰化。` },
+{ q: `上人說：「著作講演，必依_____，絕不妄自，越格發揮。」`, a: `傳承` },
+{ q: `注意事項(十六)「嚴格按照傳承」中，強調寧願被人說老套無奇，也不可為了獲得喝彩而_____。`, a: `別出新章` },
+{ q: `法師認為，法義是事關眾生法身慧命的大事，如同什麼一樣危險，不能玩花樣？`, a: `如同高空走鋼絲。` },
+{ q: `注意事項(十七)「請法要簡單，不要繁瑣」中，法師提到淨土法門是阿彌陀佛的什麼法？`, a: `「不請之法」。` },
+{ q: `為何淨土法門的行者請法儀式要簡單，不像聖道門那樣隆重？`, a: `因為淨土門行者是罪惡凡夫，沒有德行，繁瑣的儀式會損福報；而聖道門行者有深厚德行，需隆重儀式以顯尊重。` },
+{ q: `法師認為，法義學習是佛教生存的_____，也是個人及眾生法身慧命乃至彌陀生命之所繫。`, a: `命脈` }
+        ];
+
+        let currentCard = 0;
+        let isFlipped = false;
+        let currentFontSize = 24;
+
+        function initFlashcards() {
+            if(flashcards.length > 0) updateCard();
+        }
+
+        function updateCard() {
+            const card = flashcards[currentCard];
+            document.getElementById('questionText').innerHTML = card.q.replace(/\n/g, '<br>');
+            document.getElementById('answerText').innerHTML = card.a.replace(/\n/g, '<br>');
+            document.getElementById('statusText').textContent = `第 ${currentCard + 1} 題，共 ${flashcards.length} 題`;
+            
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === flashcards.length - 1;
+            
+            if (isFlipped) {
+                document.getElementById('flashcard').classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCard < flashcards.length - 1) {
+                currentCard++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                updateCard();
+            }
+        }
+
+        function randomCard() {
+            if (flashcards.length <= 1) return;
+            let newCard;
+            do {
+                newCard = Math.floor(Math.random() * flashcards.length);
+            } while (newCard === currentCard);
+            currentCard = newCard;
+            updateCard();
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 40) currentFontSize = 40;
+            document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+        }
+
+        function speakText(event, side) {
+            event.stopPropagation();
+            const textHTML = flashcards[currentCard][side];
+            const text = textHTML.replace(/<[^>]*>?/gm, ''); 
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器不支援語音朗讀功能");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkLock);
+    </script>
+</body>
+</html>

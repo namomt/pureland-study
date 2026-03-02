@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>念佛人應有的基本觀念與心態 - 學習測驗</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #5d4037;
+            --secondary-color: #8d6e63;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --font-size-base: 24px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+        #main-content { width: 100%; max-width: 800px; }
+        .container { width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary-color); font-size: 1.5em; margin: 0 0 10px 0; }
+        .progress-container {
+            width: 100%; height: 10px; background-color: #e0e0e0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background-color: var(--primary-color);
+            width: 0%; transition: width 0.3s ease;
+        }
+        .status-text { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .flashcard {
+            perspective: 1000px; width: 100%; min-height: 350px; cursor: pointer; margin-bottom: 30px;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d; min-height: 350px;
+        }
+        .flashcard.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background-color: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            transform: rotateY(180deg); background-color: #fafafa; border: 2px solid var(--primary-color);
+        }
+        .card-content { font-size: 1.2em; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+        .card-label {
+            position: absolute; top: 15px; left: 20px; font-size: 0.7em;
+            color: #999; text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        button.ctrl-btn {
+            padding: 12px 24px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        button.ctrl-btn:hover { background-color: var(--secondary-color); }
+        button.ctrl-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .size-controls button, .speak-btn {
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em;
+        }
+        .size-controls button:hover, .speak-btn:hover {
+            background-color: var(--primary-color); color: white;
+        }
+        
+        /* 密碼輸入框樣式 */
+        .lock-input {
+            width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; 
+            border-radius: 5px; box-sizing: border-box; text-align: center; font-size: 16px;
+        }
+        .lock-btn {
+            width: 100%; padding: 10px; background-color: #5d4037; color: white; 
+            border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;
+        }
+        .lock-btn:hover { background-color: #8d6e63; }
+
+        @media (max-width: 600px) {
+            :root { --font-size-base: 20px; }
+            .controls { gap: 10px; }
+            button.ctrl-btn { padding: 10px 15px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-content">
+        <div class="container">
+            <div class="top-controls">
+                <a href="index.html" style="text-decoration: none; color: var(--primary-color); font-size: 0.9em;">
+                    <i class="fas fa-arrow-left"></i> 回首頁
+                </a>
+                <div class="size-controls">
+                    <button onclick="changeFontSize(-2)">A-</button>
+                    <button onclick="changeFontSize(2)">A+</button>
+                </div>
+            </div>
+
+            <div class="header">
+                <h1>念佛人應有的基本觀念與心態</h1>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">載入中...</div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-label">問題</span>
+                        <button class="speak-btn" onclick="speakText(event, 'q')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="questionText"></div>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">答案</span>
+                        <button class="speak-btn" id="speakBtnA" onclick="speakText(event, 'a')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="answerText" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevCard()">
+                    <i class="fas fa-chevron-left"></i> 上一題
+                </button>
+                <button class="ctrl-btn" onclick="randomCard()">
+                    <i class="fas fa-random"></i> 隨機
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextCard()">
+                    下一題 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "9419";
+        const unlockTimeStr = "2026/03/03 21:00"; 
+        let isUnlocked = false;
+        
+        function checkLock() {
+            if (!unlockTimeStr) {
+                isUnlocked = true;
+            } else {
+                const unlockDate = new Date(unlockTimeStr).getTime();
+                const now = new Date().getTime();
+                if (now >= unlockDate || sessionStorage.getItem("unlocked_念佛人應有的基本觀念與心態") === "true") {
+                    isUnlocked = true;
+                }
+            }
+            initFlashcards(); 
+        }
+
+        function verifyPassword() {
+            const inputElement = document.getElementById("pwd-input");
+            if (!inputElement) return;
+            const input = inputElement.value;
+            
+            if (input === correctPassword || correctPassword === "") {
+                sessionStorage.setItem("unlocked_念佛人應有的基本觀念與心態", "true");
+                isUnlocked = true;
+                // 保持翻開狀態並重新渲染卡片，讓答案瞬間浮現！
+                updateCard(true); 
+            } else {
+                alert("密碼錯誤，請重新輸入！");
+                inputElement.value = "";
+            }
+        }
+
+        const flashcards = [
+{ q: `根據慧淨法師的開示，念佛人求生極樂世界的目的是什麼？`, a: `是最高、究竟，而且是唯一的目的，其他效益皆為附帶。` },
+{ q: `念佛帶來的消業障、增福慧等世間利益，為何被視為「附帶的」？`, a: `因為這些利益是無常且不究竟的，死後依然會六道輪迴。` },
+{ q: `一位真正的念佛人，對往生極樂世界的心態應該是怎樣的？`, a: `由始至終，百分之百的堅定，不會中途退失、改變。` },
+{ q: `文中所定義的「凡夫」內涵是什麼？`, a: `貪瞋痴具足、妄想雜念不斷，並且貪著五欲的塵勞。` },
+{ q: `什麼是「博地凡夫」？`, a: `自覺自己的貪瞋痴煩惱比別人更熾盛，且無力靠自力修持戒定慧的凡夫。` },
+{ q: `念佛法門是否要求行者必須先斷除五欲之心？`, a: `不是，阿彌陀佛正是為了無法靠自力斷除五欲的凡夫而建立此法門。` },
+{ q: `即使平時對世間仍有貪著，為何這不會障礙往生？`, a: `因為阿彌陀佛本來就是要救度這樣的眾生，這正是我們需要求生淨土的原因。` },
+{ q: `在臨命終時，念佛人面臨娑婆世界與極樂世界的選擇，必須做出什麼決定？`, a: `必須完全放下對世間的一切執著，選擇往生極樂世界。` },
+{ q: `如果在臨終的緊要關頭仍然執著不放，這代表什麼？`, a: `代表平時說要往生極樂世界的心是假的，不是真的。` },
+{ q: `為什麼人死後想永遠停留在陽世的家中或與子孫相伴是不可能的？`, a: `因為每個人都要隨自己的業報去投胎轉世，不可能永遠停留在中陰身狀態。` },
+{ q: `往生極樂世界後，念佛人如何才能繼續照顧世間的眷屬？`, a: `往生後會擁有神通，可以回來探視並救度他們到極樂世界團圓。` },
+{ q: `念佛人應如何看待今生所遭遇的成敗得失與苦樂禍福？`, a: `應相信這百分之百是過去生生世世自己所造的因果業報。` },
+{ q: `一個念佛人面對逆境時，應秉持_____、_____、_____之心。`, a: `安分守己、隨遇而安、逆來順受` },
+{ q: `若念佛人凡事不平不滿、嫉妒計較，這是因為不了解什麼道理？`, a: `不了解善惡報應、三世因果、自作自受的道理。` },
+{ q: `面對他人不友善的對待時，為何不應「以牙還牙」？`, a: `因為這可能是償還過去所欠的債，以牙還牙會再造新業。` },
+{ q: `一個念佛人的三個核心要點是什麼？`, a: `第一「隨緣消舊業，更莫造新殃」，第二專念南無阿彌陀佛，第三願生極樂世界。` },
+{ q: `為何念佛人所做的善行，對於往生而言「沒有增減影響」？`, a: `因為往生是專靠「南無阿彌陀佛」這句萬德洪名，其功德已圓滿具足且超越六度萬行。` },
+{ q: `念佛的方式有哪四種？`, a: `大聲念、小聲念、金剛念、心中默念。` },
+{ q: `什麼是「金剛念」，以及為何平時鼓勵以此方式念佛？`, a: `指動嘴唇不出聲，自己聽得到。因其不累、不傷氣，可以長久持念。` },
+{ q: `為何不特別鼓勵用心中默念的方式？`, a: `因為凡夫容易落入妄想雜念中而沒有察覺，動嘴唇有助於攝心。` },
+{ q: `在走路、工作等不動腦筋的時候念佛，稱為什麼念佛？`, a: `散心念佛。` },
+{ q: `在空閒的時候，一字一句清楚地念佛，稱為什麼念佛？`, a: `專心念佛。` },
+{ q: `念佛人不應因為有在_____念佛，就忽略了利用空閒時間_____念佛。`, a: `散心；專心` },
+{ q: `阿彌陀佛的第十八願中「乃至十念」的涵義，啟示我們應該如何念佛？`, a: `就是要我們隨順自己的時間和能力去念佛，一有時間就念佛。` },
+{ q: `《地藏經》中描述眾生「舉止動念，無不是業，無不是罪」，對此念佛人應如何轉念？`, a: `應將妄想雜念轉來念「南無阿彌陀佛」，以正念消解雜念。` },
+{ q: `當一個人對往生極樂世界的心很懇切時，會自然產生什麼行為？`, a: `他會自然而然地想要念佛，不需別人鼓勵鞭策。` },
+{ q: `一個決定往生的人，其往生是在何時就確定的？`, a: `是在平生就已經決定下來了，稱為「平生業成」。` },
+{ q: `經文「光明遍照十方世界，念佛眾生攝取不捨」給予念佛人什麼樣的保障？`, a: `念佛人從現在到臨終，都時刻在阿彌陀佛的光明攝取之中，絕不會被遺漏。` },
+{ q: `為何念佛人即使在臨終病苦無法出聲念佛時，心中依然有大安心？`, a: `因為他了解佛心，知道時間一到，阿彌陀佛必定會來接引他。` },
+{ q: `念佛人為人處世應秉持的兩句話、六個字原則是什麼？`, a: `「守大體、有分寸」。` },
+{ q: `問答中提到，若念佛人臨終時未見佛來接引，這是什麼原因？`, a: `表示時候未到，只要時間到了，阿彌陀佛一定會現前。` },
+{ q: `為什麼有些念佛人會擔心臨終時病痛纏身無法念佛，佛就不來接引？`, a: `因為他們對阿彌陀佛第十八願的本願救度道理不了解，對佛心不明瞭。` },
+{ q: `平常念佛應以念六字還是四字為主？`, a: `以念「南無阿彌陀佛」六字為主。` },
+{ q: `在什麼情況下可以改念四字「阿彌陀佛」佛號？`, a: `在臨睡時，或因病痛纏身無法念六字時。` },
+{ q: `念四字佛號時，若愈念愈快以求攝心，可能隱含什麼樣的心態而不自知？`, a: `可能兼含有自力之心，而非完全依靠他力。` },
+{ q: `祭祖時，淨土法門的行者應如何做，以取代燒紙錢的習俗？`, a: `誦一部《阿彌陀經》之後，稱念阿彌陀佛名號迴向即可。` },
+{ q: `為什麼無法單從一個念佛人的外觀言行，判斷他臨終時是否一定會往生？`, a: `因為往生的關鍵在於內心的願生心與信心，而外在行為可能虛假。` },
+{ q: `淨土法門被稱為「易行道」，其「易」有哪三個意涵？`, a: `簡易（簡單不複雜）、容易（不困難）、安易（輕鬆而安樂）。` },
+{ q: `龍樹菩薩在《易行品》中將淨土法門比喻為什麼？`, a: `比喻為坐船，並說「乘船則樂」。` },
+{ q: `在搭乘阿彌陀佛的「大願船」時，念佛人需要做什麼？`, a: `什麼都不用做，只要「安分守己」留在船上就好。` },
+{ q: `所謂念佛人的「安分守己」是指什麼？`, a: `指「隨緣消舊業，更莫造新殃」，決定願生極樂，專念「南無阿彌陀佛」。` },
+{ q: `「至心信樂」的「樂」字，在此處應讀作什麼音，並有什麼涵義？`, a: `讀作「ㄧㄠˋ」，有喜愛、想要去極樂世界的意思。` },
+{ q: `善導大師所說的「念念稱名常懺悔」是什麼樣的心境？`, a: `了知自己是罪惡凡夫，無力自救，在念佛中自然存有感恩與懺悔的心念。` },
+{ q: `為何淨土法門的懺悔能同時帶來喜樂與安慰？`, a: `因為知道雖業障深重，但因彌陀救度，決定不會墮落，能脫離輪迴。` },
+{ q: `閱讀淨土宗相關書籍的主要目的是什麼？`, a: `是為了了解念佛決定往生的道理，從而能夠安心、老實地念佛。` },
+{ q: `在早晚課中，是否需要誦念《心經》、《普門品》等其他經典？`, a: `不用，專念「南無阿彌陀佛」即可，因為佛號功德比誦任何經的功德都高。` },
+{ q: `家中若空間許可，念佛人應如何設置佛堂？`, a: `供奉一尊「南無阿彌陀佛」，對聯用「光明遍照十方世界，念佛眾生攝取不捨」。` },
+{ q: `若家中沒有地方供奉佛像，應該怎麼辦？`, a: `沒關係，只要時時處處念佛即可，因為內心就是最清淨莊嚴的佛堂。` },
+{ q: `人死後身體柔軟，是否就是往生極樂世界的唯一證明？`, a: `不是，往生天庭、做神、或轉世為人享受福報，身體也可能柔軟。` },
+{ q: `判斷亡者是否往生的標準有哪兩種？`, a: `一是看他平生是否願生專念；二是臨終時有人見佛接引或託夢告知。` },
+{ q: `臨終助念時，亡者可能因哪兩種執著而無法往生？`, a: `執著「愛」（如依戀家人）與執著「恨」（如怨恨他人）。` },
+{ q: `體質容易「卡到陰」的人，應如何改善？`, a: `應有正知正見，專心念佛，相信「正心誠意，百邪不侵」。` },
+{ q: `古人說「狐怕正人」給予我們什麼啟示？`, a: `妖魔鬼怪都害怕心地端正的人，只要心正，就不易受邪祟侵擾。` },
+{ q: `對於想為兒女留下財產的父母，文中提出的智慧觀點是什麼？`, a: `應留「福德」給子孫，而非留下有形的錢財，因為「富不過三代」。` },
+{ q: `古人說：「要好兒孫，只要_____，不要_____。」`, a: `積德；積財` },
+{ q: `佛陀所說的「五家共有之財」是指什麼？`, a: `指世間財產會被水、火、盜賊、官吏及不肖子孫所消散，故為不堅之財。` },
+{ q: `對眷屬真正的愛心，應是引導他們走向什麼道路？`, a: `引導他們學習淨土法門，同生極樂世界，走向解脫之道。` },
+{ q: `念一句佛號的功德，是否只能迴向給單一對象？`, a: `不是，一句佛號的功德可以迴向給百千萬的對象。` },
+{ q: `迴向時應把握什麼原則？`, a: `把握重點敘述，真誠懇切地將所關心的事項表達出來即可。` },
+{ q: `除了言語教導，教養子女更重要的方法是什麼？`, a: `身教重於言教，父母自己做得端正，自然會影響子女。` },
+{ q: `家中若有一人精進念佛，對家人會有什麼影響？`, a: `家人會受到他的福德庇蔭，無形中也會改變家人，即「一人有福，牽帶全屋」。` },
+{ q: `念佛人面對家庭、事業等苦境，應以哪兩種觀念來看待？`, a: `應以「還債」和「感恩」的觀念來看待。` },
+{ q: `為何面對逆境時要有「感恩的心」？`, a: `因為這是「重報輕受」，且是讓我們償還宿業、未來得以往生的機緣。` },
+{ q: `有時因為世俗事煩心，念佛愈念愈煩，應如何轉念？`, a: `應反省自己是凡夫，這是自己所造的業，本該承受，心就會平復。` },
+{ q: `為何說「苦是入道的緣」？`, a: `因為若沒有苦，我們很難想要尋求解脫；是苦的因緣警惕我們厭離娑婆、欣慕淨土。` },
+{ q: `學佛的人要有「機」與「法」的深信，「機」的深信是指什麼？`, a: `深信自己是罪惡生死凡夫，曠劫以來常沒常流轉，無有出離之緣。` },
+{ q: `學佛的人要有「機」與「法」的深信，「法」的深信是指什麼？`, a: `深信阿彌陀佛四十八願，攝受眾生，無疑無慮，乘彼願力，定得往生。` }
+        ];
+
+        let currentCard = 0;
+        let isFlipped = false;
+        let currentFontSize = 24;
+
+        function initFlashcards() {
+            if(flashcards.length > 0) updateCard();
+        }
+
+        // 加入 keepFlipped 參數，解鎖瞬間可以不強制翻回正面
+        function updateCard(keepFlipped = false) {
+            const card = flashcards[currentCard];
+            
+            // 題目永遠顯示
+            document.getElementById('questionText').innerHTML = card.q.replace(/\n/g, '<br>');
+            
+            // 判斷答案是否顯示
+            if (isUnlocked) {
+                document.getElementById('answerText').innerHTML = card.a.replace(/\n/g, '<br>');
+                document.getElementById('speakBtnA').style.display = 'block';
+            } else {
+                // 上鎖狀態下的背面 UI
+                document.getElementById('answerText').innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; color: #888;">
+                        <i class="fas fa-lock" style="font-size: 3.5em; margin-bottom: 15px; color: #8d6e63;"></i>
+                        <h3 style="margin: 0 0 5px 0; color: #5d4037;">答案已上鎖</h3>
+                        <p style="font-size: 0.85em; margin: 0 0 20px 0;">公開時間：${unlockTimeStr}</p>
+                        <div style="width: 100%; max-width: 250px;">
+                            <input type="password" id="pwd-input" class="lock-input" placeholder="輸入密碼提前解鎖" 
+                                   onclick="event.stopPropagation();" 
+                                   onkeydown="event.stopPropagation(); if(event.key === 'Enter') verifyPassword();">
+                            <button class="lock-btn" onclick="event.stopPropagation(); verifyPassword();">
+                                解鎖全部答案
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('speakBtnA').style.display = 'none';
+            }
+
+            document.getElementById('statusText').textContent = `第 ${currentCard + 1} 題，共 ${flashcards.length} 題`;
+            
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === flashcards.length - 1;
+            
+            // 切換題目時，若卡片是翻開的就翻回正面
+            if (!keepFlipped && isFlipped) {
+                document.getElementById('flashcard').classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCard < flashcards.length - 1) {
+                currentCard++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                updateCard();
+            }
+        }
+
+        function randomCard() {
+            if (flashcards.length <= 1) return;
+            let newCard;
+            do {
+                newCard = Math.floor(Math.random() * flashcards.length);
+            } while (newCard === currentCard);
+            currentCard = newCard;
+            updateCard();
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 40) currentFontSize = 40;
+            document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+        }
+
+        function speakText(event, side) {
+            event.stopPropagation();
+            const textHTML = flashcards[currentCard][side];
+            const text = textHTML.replace(/<[^>]*>?/gm, ''); 
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器不支援語音朗讀功能");
+            }
+        }
+
+        // 頁面載入時檢查鎖定狀態並初始化
+        document.addEventListener('DOMContentLoaded', checkLock);
+    </script>
+</body>
+</html>

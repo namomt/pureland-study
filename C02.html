@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居士能做弘法的事嗎 - 問題閃卡</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #5d4037;
+            --secondary-color: #8d6e63;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --font-size-base: 24px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--background-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .lock-box {
+            background: var(--card-bg); padding: 40px 30px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+            max-width: 400px; width: 90%;
+        }
+        .lock-box input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc;
+            border-radius: 8px; font-size: 18px; box-sizing: border-box; text-align: center;
+        }
+        .lock-box button {
+            width: 100%; padding: 12px; background: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 18px;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .lock-box button:hover { background: var(--secondary-color); }
+        
+        #main-content { display: none; width: 100%; max-width: 800px; }
+        .container { width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary-color); font-size: 1.5em; margin: 0 0 10px 0; }
+        .progress-container {
+            width: 100%; height: 10px; background-color: #e0e0e0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background-color: var(--primary-color);
+            width: 0%; transition: width 0.3s ease;
+        }
+        .status-text { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .flashcard {
+            perspective: 1000px; width: 100%; min-height: 300px; cursor: pointer; margin-bottom: 30px;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d; min-height: 300px;
+        }
+        .flashcard.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background-color: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            transform: rotateY(180deg); background-color: #fafafa; border: 2px solid var(--primary-color);
+        }
+        .card-content { font-size: 1.2em; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+        .card-label {
+            position: absolute; top: 15px; left: 20px; font-size: 0.7em;
+            color: #999; text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        button.ctrl-btn {
+            padding: 12px 24px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        button.ctrl-btn:hover { background-color: var(--secondary-color); }
+        button.ctrl-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .size-controls button, .speak-btn {
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em;
+        }
+        .size-controls button:hover, .speak-btn:hover {
+            background-color: var(--primary-color); color: white;
+        }
+        @media (max-width: 600px) {
+            :root { --font-size-base: 20px; }
+            .controls { gap: 10px; }
+            button.ctrl-btn { padding: 10px 15px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="lock-screen">
+        <div class="lock-box">
+            <i class="fas fa-lock" style="font-size: 40px; color: #5d4037; margin-bottom: 20px;"></i>
+            <h2 style="color: #333; margin-bottom: 10px;">內容已上鎖</h2>
+            <p style="color: #666; font-size: 15px; margin-bottom: 20px;">
+                公開時間：<strong id="display-unlock-time">2025/12/05 0:00</strong><br>
+                時間未到前，請輸入密碼解鎖。
+            </p>
+            <input type="password" id="pwd-input" placeholder="請輸入密碼" onkeypress="handleEnter(event)">
+            <button onclick="verifyPassword()">解鎖內容</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="container">
+            <div class="top-controls">
+                <a href="index.html" style="text-decoration: none; color: var(--primary-color); font-size: 0.9em;">
+                    <i class="fas fa-arrow-left"></i> 回首頁
+                </a>
+                <div class="size-controls">
+                    <button onclick="changeFontSize(-2)">A-</button>
+                    <button onclick="changeFontSize(2)">A+</button>
+                </div>
+            </div>
+
+            <div class="header">
+                <h1>居士能做弘法的事嗎</h1>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">載入中...</div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-label">問題</span>
+                        <button class="speak-btn" onclick="speakText(event, 'q')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="questionText"></div>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">答案</span>
+                        <button class="speak-btn" onclick="speakText(event, 'a')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="answerText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevCard()">
+                    <i class="fas fa-chevron-left"></i> 上一題
+                </button>
+                <button class="ctrl-btn" onclick="randomCard()">
+                    <i class="fas fa-random"></i> 隨機
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextCard()">
+                    下一題 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "1511";
+        const unlockTimeStr = "2025/12/05 0:00"; 
+        
+        function checkLock() {
+            if (!unlockTimeStr) return unlock(); 
+            
+            const unlockDate = new Date(unlockTimeStr).getTime();
+            const now = new Date().getTime();
+            
+            if (now >= unlockDate) {
+                unlock(); 
+            } else if (sessionStorage.getItem("unlocked_居士能做弘法的事嗎") === "true") {
+                unlock(); 
+            }
+        }
+
+        function verifyPassword() {
+            const input = document.getElementById("pwd-input").value;
+            if (input === correctPassword || correctPassword === "") {
+                sessionStorage.setItem("unlocked_居士能做弘法的事嗎", "true");
+                unlock();
+            } else {
+                alert("密碼錯誤，請重新輸入！");
+                document.getElementById("pwd-input").value = "";
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') verifyPassword();
+        }
+
+        function unlock() {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
+            initFlashcards(); 
+        }
+
+        const flashcards = [
+{ q: `根據文本，有些佛弟子指責在家居士弘法的理由是什麼？`, a: `他們認為居士只是護法，沒資格弘法利生，弘法是出家人的事。` },
+{ q: `智隨法師如何定義「護法」與「弘法」之間的關係？`, a: `護法就是弘法，弘法也是護法，二者本質上是同一件事。` },
+{ q: `善導大師的名言強調，將淨土法門的信仰傳授他人是為了什麼？`, a: `真正地報答佛恩（真成報佛恩）。` },
+{ q: `請完成善導大師的名句：「自信教人信，難中轉更難；_____，真成報佛恩。」`, a: `大悲傳普化` },
+{ q: `文本中提到，其中一種需要深入理論研究的弘法形式是什麼？`, a: `講經說法，它能在理論上作正面引導。` },
+{ q: `除了講經說法，另一種弘法形式是什麼？`, a: `實行，例如推廣念佛或輔助出家師父講經說法。` },
+{ q: `輔助出家師父講經說法，這種配合性的工作既可稱為「弘法」，也可定位為「_____」。`, a: `護法` },
+{ q: `根據文本，護法工作的核心圍繞著什麼？`, a: `圍繞「法」，只要能讓法推廣、流行、利益眾生都算在內。` },
+{ q: `弘揚淨土法門的標準是看身分或修行好壞嗎？`, a: `不是，淨土法門是以信仰為標準。` },
+{ q: `根據智隨法師的觀點，弘揚淨土法門的主要資格是什麼？`, a: `有正確的信仰。` },
+{ q: `文本引用哪部佛經來證明在家居士也能扮演引導眾生的「善知識」角色？`, a: `《觀經》（佛說觀無量壽佛經）。` },
+{ q: `在《觀經》的例子中，臨終時遇到善知識的是哪一類眾生？`, a: `下品下生的五逆眾生。` },
+{ q: `根據《觀經》引文，善知識對臨終的五逆眾生最初的教導是什麼？`, a: `教令念佛。` },
+{ q: `為何《觀經》中的五逆眾生無法遵從善知識最初的「念佛」教導？`, a: `因為他被劇烈的痛苦所逼迫（彼人苦逼，不惶念佛）。` },
+{ q: `當臨終者無法「念佛」時，善知識提供了什麼替代方法？`, a: `應稱無量壽佛（口稱佛號）。` },
+{ q: `根據《觀經》，五逆眾生最終以至心稱念了哪句佛號具足十念？`, a: `南無阿彌陀佛。` },
+{ q: `五逆眾生在臨終時具足十念稱「南無阿彌陀佛」後，得到了什麼結果？`, a: `如一念頃，即得往生極樂世界。` },
+{ q: `《觀經》中善知識勸人念佛的行為，在本質上被定義為什麼？`, a: `弘法。` },
+{ q: `從《觀經》的例子可以得出什麼結論，關於成為善知識的資格？`, a: `身分不重要，重要的是能引導別人對淨土法門產生信心。` }
+        ];
+
+        let currentCard = 0;
+        let isFlipped = false;
+        let currentFontSize = 24;
+
+        function initFlashcards() {
+            if(flashcards.length > 0) updateCard();
+        }
+
+        function updateCard() {
+            const card = flashcards[currentCard];
+            document.getElementById('questionText').innerHTML = card.q.replace(/\n/g, '<br>');
+            document.getElementById('answerText').innerHTML = card.a.replace(/\n/g, '<br>');
+            document.getElementById('statusText').textContent = `第 ${currentCard + 1} 題，共 ${flashcards.length} 題`;
+            
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === flashcards.length - 1;
+            
+            if (isFlipped) {
+                document.getElementById('flashcard').classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCard < flashcards.length - 1) {
+                currentCard++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                updateCard();
+            }
+        }
+
+        function randomCard() {
+            if (flashcards.length <= 1) return;
+            let newCard;
+            do {
+                newCard = Math.floor(Math.random() * flashcards.length);
+            } while (newCard === currentCard);
+            currentCard = newCard;
+            updateCard();
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 40) currentFontSize = 40;
+            document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+        }
+
+        function speakText(event, side) {
+            event.stopPropagation();
+            const textHTML = flashcards[currentCard][side];
+            const text = textHTML.replace(/<[^>]*>?/gm, ''); 
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器不支援語音朗讀功能");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkLock);
+    </script>
+</body>
+</html>
