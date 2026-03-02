@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
+   淨土教理學習題庫
+  </title>
+<style>
+   :root {
+            --base-font-size: 20px; /* 預設字體加大 */
+            --nav-height: 55px;
+            --primary-color: #5d4037;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding-top: calc(var(--nav-height) + 20px); 
+            padding-bottom: 20px;
+            padding-left: 10px; padding-right: 10px;
+            font-size: var(--base-font-size); 
+            color: #333;
+        }
+        
+        /* 懸浮工具列 - Grid 佈局 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* 左:彈性 中:自動 右:彈性 */
+            align-items: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        
+        .nav-left {
+            justify-self: start;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav-center {
+            justify-self: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            white-space: nowrap; /* 防止標題換行 */
+        }
+
+        .nav-right {
+            justify-self: end;
+            display: flex;
+            gap: 5px;
+        }
+
+        .tool-btn {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        .tool-btn:hover { background: #e0e0e0; }
+        .tool-btn:active { transform: scale(0.96); }
+        .tool-btn.active { background-color: var(--primary-color); color: white; }
+
+        /* 內容區塊 */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        /* 隱藏原本在內容裡的標題，因為已經移到 Navbar */
+        .container h1 {
+            display: none;
+        }
+        
+        .course-list { list-style: none; padding: 0; }
+        .course-item { margin-bottom: 15px; }
+        .course-link {
+            display: block;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #444;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .course-link:hover {
+            background-color: #f9fbe7;
+            border-color: #c5e1a5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .title { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
+        .date { font-size: 0.85em; color: #999; margin-left: 10px; min-width: 80px; text-align: right; }
+        .badge {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 0.2em 0.6em;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            .course-link { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .date { align-self: flex-end; margin-left: 0; }
+            .tool-btn { padding: 6px 10px; font-size: 0.85rem; } 
+            .nav-center { font-size: 1rem; } /* 手機上標題稍微縮小一點 */
+        }
+  </style>
+</head>
+<body>
+<div class="navbar">
+<div class="nav-left">
+<button class="tool-btn" id="btn-new" onclick="sortList('desc')">
+     新
+    </button>
+<button class="tool-btn" id="btn-old" onclick="sortList('asc')">
+     舊
+    </button>
+</div>
+<div class="nav-center">
+    淨土教理學習題庫
+   </div>
+<div class="nav-right">
+<button class="tool-btn" onclick="changeFontSize(-2)">
+     小
+    </button>
+<button class="tool-btn" onclick="changeFontSize(2)">
+     大
+    </button>
+</div>
+</div>
+<div class="container">
+<h1>
+    淨土教理學習題庫
+   </h1>
+<ul class="course-list"><li class="course-item"><a class="course-link" href="C05.html"><div><span class="badge">05</span><span class="title">念佛人應有的基本觀念與心態</span></div><span class="date">2026-03-03</span></a></li><li class="course-item"><a class="course-link" href="C04.html"><div><span class="badge">04</span><span class="title">學法十二防</span></div><span class="date">2025-12-12</span></a></li><li class="course-item"><a class="course-link" href="C03.html"><div><span class="badge">03</span><span class="title">受教與發心</span></div><span class="date">2025-12-05</span></a></li><li class="course-item"><a class="course-link" href="C02.html"><div><span class="badge">02</span><span class="title">居士能做弘法的事嗎</span></div><span class="date">2025-12-05</span></a></li><li class="course-item"><a class="course-link" href="C01.html"><div><span class="badge">01</span><span class="title">提升自我無止境</span></div><span class="date">2025-12-05</span></a></li></ul>
+</div>
+<script id="app-script">
+   let currentSize = 20; /* 對應 CSS root 預設值 */
+        
+        function changeFontSize(delta) {
+            currentSize += delta;
+            if (currentSize < 14) currentSize = 14; 
+            if (currentSize > 32) currentSize = 32; 
+            document.documentElement.style.setProperty('--base-font-size', currentSize + 'px');
+        }
+
+        function sortList(order) {
+            const list = document.querySelector('.course-list');
+            const items = Array.from(list.querySelectorAll('.course-item'));
+            
+            items.sort((a, b) => {
+                // 依照 Badge 編號排序
+                const valA = parseInt(a.querySelector('.badge').textContent.trim()) || 0;
+                const valB = parseInt(b.querySelector('.badge').textContent.trim()) || 0;
+                
+                if (order === 'desc') {
+                    // 新 = 大 -> 小
+                    return valB - valA;
+                } else {
+                    // 舊 = 小 -> 大
+                    return valA - valB;
+                }
+            });
+
+            list.innerHTML = '';
+            items.forEach(item => list.appendChild(item));
+
+            // 更新按鈕狀態
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (order === 'desc') {
+                document.getElementById('btn-new').classList.add('active');
+            } else {
+                document.getElementById('btn-old').classList.add('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 預設: 新 (編號大在上面)
+            sortList('desc'); 
+        });
+  </script>
+</body>
+</html>
