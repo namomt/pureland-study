@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>醉心念佛不想弘法利生可以嗎 - 學習測驗</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #5d4037;
+            --secondary-color: #8d6e63;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --font-size-base: 24px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+        #main-content { width: 100%; max-width: 800px; }
+        .container { width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary-color); font-size: 1.5em; margin: 0 0 10px 0; }
+        .progress-container {
+            width: 100%; height: 10px; background-color: #e0e0e0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background-color: var(--primary-color);
+            width: 0%; transition: width 0.3s ease;
+        }
+        .status-text { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .flashcard {
+            perspective: 1000px; width: 100%; min-height: 350px; cursor: pointer; margin-bottom: 30px;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d; min-height: 350px;
+        }
+        .flashcard.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background-color: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            transform: rotateY(180deg); background-color: #fafafa; border: 2px solid var(--primary-color);
+        }
+        .card-content { font-size: 1.2em; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+        .card-label {
+            position: absolute; top: 15px; left: 20px; font-size: 0.7em;
+            color: #999; text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        button.ctrl-btn {
+            padding: 12px 24px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        button.ctrl-btn:hover { background-color: var(--secondary-color); }
+        button.ctrl-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .size-controls button, .speak-btn {
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em;
+        }
+        .size-controls button:hover, .speak-btn:hover {
+            background-color: var(--primary-color); color: white;
+        }
+        
+        .lock-input {
+            width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; 
+            border-radius: 5px; box-sizing: border-box; text-align: center; font-size: 16px;
+        }
+        .lock-btn {
+            width: 100%; padding: 10px; background-color: #5d4037; color: white; 
+            border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;
+        }
+        .lock-btn:hover { background-color: #8d6e63; }
+
+        @media (max-width: 600px) {
+            :root { --font-size-base: 20px; }
+            .controls { gap: 10px; }
+            button.ctrl-btn { padding: 10px 15px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-content">
+        <div class="container">
+            <div class="top-controls">
+                <a href="index.html" style="text-decoration: none; color: var(--primary-color); font-size: 0.9em;">
+                    <i class="fas fa-arrow-left"></i> 回首頁
+                </a>
+                <div class="size-controls">
+                    <button onclick="changeFontSize(-2)">A-</button>
+                    <button onclick="changeFontSize(2)">A+</button>
+                </div>
+            </div>
+
+            <div class="header">
+                <h1>醉心念佛不想弘法利生可以嗎</h1>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">正在連線確認解鎖狀態...</div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-label">問題</span>
+                        <button class="speak-btn" onclick="speakText(event, 'q')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="questionText">載入中...</div>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">答案</span>
+                        <button class="speak-btn" id="speakBtnA" onclick="speakText(event, 'a')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="answerText" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevCard()">
+                    <i class="fas fa-chevron-left"></i> 上一題
+                </button>
+                <button class="ctrl-btn" onclick="randomCard()">
+                    <i class="fas fa-random"></i> 隨機
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextCard()">
+                    下一題 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "3560";
+        const unlockTimeStr = "2026/06/30 00:00"; 
+        const pageId = "C07";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbwsB39S65NUQ9b2-XdqrSb8rtb2CkaNSfkzM6WjlD1UfOD86C6HKof_VLhwCUjYrjSOzg/exec";
+        
+        let isUnlocked = false;
+        
+        async function checkLock() {
+            if (!unlockTimeStr) {
+                isUnlocked = true;
+                initFlashcards();
+                return;
+            }
+            
+            const unlockDate = new Date(unlockTimeStr).getTime();
+            const now = new Date().getTime();
+            if (now >= unlockDate || sessionStorage.getItem("unlocked_" + pageId) === "true") {
+                isUnlocked = true;
+                initFlashcards();
+                return;
+            }
+
+            try {
+                const res = await fetch(gasUrl + "?pageId=" + encodeURIComponent(pageId));
+                const data = await res.json();
+                if (data.isUnlocked) {
+                    isUnlocked = true;
+                    sessionStorage.setItem("unlocked_" + pageId, "true");
+                }
+            } catch (e) {
+                console.log("雲端同步失敗", e);
+            }
+            
+            initFlashcards(); 
+        }
+
+        async function verifyPassword() {
+            const inputElement = document.getElementById("pwd-input");
+            if (!inputElement) return;
+            const input = inputElement.value;
+            const btn = inputElement.nextElementSibling;
+            
+            if (input === correctPassword || correctPassword === "") {
+                btn.innerText = "解鎖中...";
+                btn.disabled = true;
+                
+                try {
+                    await fetch(gasUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'unlock', pageId: pageId, password: input })
+                    });
+                } catch (e) { console.log(e); }
+                
+                sessionStorage.setItem("unlocked_" + pageId, "true");
+                isUnlocked = true;
+                updateCard(true); 
+            } else {
+                alert("密碼錯誤，請重新輸入！");
+                inputElement.value = "";
+            }
+        }
+
+        const flashcards = [
+{ q: `根據文本，念佛念到什麼程度才算「盡興」？`, a: `每天不少於十小時。` },
+{ q: `淨宗法師對「念佛上癮」的現象持什麼態度？`, a: `非常恭喜和祝賀，認為念佛已「上了路子」。` },
+{ q: `蓮友擔心「弘法」會對「念佛」產生什麼負面影響？`, a: `擔心弘法會耗費稱名的大把光陰。` },
+{ q: `淨宗法師建議醉心念佛的蓮友在「知見」上應如何發心？`, a: `若有條件，還是要發心去利他（弘法）。` },
+{ q: `為什麼「平生業成」的人更有餘力去弘法？`, a: `因為往生大事已成辦，能騰出時間和精力去利他。` },
+{ q: `對於尚未「安心」的修行者，首要任務是什麼？`, a: `解決自己的生死大事。` },
+{ q: `文本中提到，佛對念佛人最大的期望是什麼？`, a: `希望我們可以帶更多的眾生回到極樂世界。` },
+{ q: `何謂「稱佛本心」的具體行為？`, a: `若遇有緣，勸歸淨土。` },
+{ q: `根據祖師教言，什麼樣的行為才算「真報佛恩」？`, a: `能夠勸化眾生（即便只有一人）捨苦出生死，往生淨土。` },
+{ q: `祖師偈言：「_____，難中轉更難，大悲傳普化，真成報佛恩。」`, a: `自信教人信` },
+{ q: `「憫眾生苦」的觀點中，將眾生比作修行者過去的什麼身分？`, a: `父母、兄弟、六親眷屬。` },
+{ q: `在「自他一體」的觀念中，所謂的「外人」與修行者是什麼關係？`, a: `不分離的、一體的關係。` },
+{ q: `隨緣勸化眾生是否會妨礙念佛？`, a: `不會妨礙念佛。` },
+{ q: `弘法利生對修行者的「悲心願力」有何作用？`, a: `具有增長的作用。` },
+{ q: `弘法利生能增長修行者對淨土涅槃常樂果報的什麼心？`, a: `嚮往與欣求之心。` },
+{ q: `對於「沒有度化因緣、時間條件不允許」的老年人，應以什麼為重？`, a: `保證自己念佛，隨緣對家人勸導即可。` },
+{ q: `淨宗法師為年輕人修改的偈子中，最後一句「二者皆可抛」改成了什麼？`, a: `二者皆可操。` },
+{ q: `在修改後的偈子中，「二者」是指哪兩項？`, a: `學法與弘法。` },
+{ q: `學法、弘法與念佛之間是什麼樣的「行」之關係？`, a: `正行與助行的關係。` },
+{ q: `「行起解絕」在淨土教法中的真實含義是什麼？`, a: `懂得念佛必生之理後徹底安心，念佛時不需再過濾道理。` },
+{ q: `初機修行者為什麼需要種種「理解」？`, a: `為了讓自己覺得往生有分，進而安心起行。` },
+{ q: `在「安心念佛」的同時閱讀教理書籍，是否與「行起解絕」矛盾？`, a: `不矛盾。` },
+{ q: `「解行並進」在時間分配上應如何理解？`, a: `非單指時間切割，而是教理理解與行持在當下的相互助益。` },
+{ q: `弘法時感到「心有餘而力不足」的原因通常是什麼？`, a: `可能是不太懂得隨緣，沒有保持中道。` },
+{ q: `在弘法利生的過程中，真正「度眾生」的力量源自於誰？`, a: `佛（阿彌陀佛）。` },
+{ q: `修行者在弘法工作中所扮演的角色是什麼？`, a: `介紹人。` },
+{ q: `為什麼弘法利生不存在「能力足不足」的問題？`, a: `因為弘法是隨分隨力去做，核心力量來自佛而非個人。` },
+{ q: `如果念佛「入得進去、出不來」，可能會有什麼負面傾向？`, a: `耽樂其中，缺乏利他之心的發起。` },
+{ q: `文本中提到的「正為念佛故，二者皆可操」，其目的是什麼？`, a: `為了更好地念佛。` },
+{ q: `修行者「安心」後，與「不安心」者在利他態度上有何不同？`, a: `安心者已成辦大事可騰出精力利他；不安心者需先解決自身生死。` },
+{ q: `「若得一人舍苦出生死者，是名真報佛恩」這句話是誰說的？`, a: `祖師。` },
+{ q: `「大悲傳普化」的目的是為了達成什麼？`, a: `真成報佛恩。` },
+{ q: `「解」對「行」的作用是什麼？`, a: `正確的教理理解有助於行持。` },
+{ q: `「行」對「解」的作用是什麼？`, a: `行持的當下有助於加深對法義的理解。` },
+{ q: `法師建議如何應對「愛上念佛」而不想弘法的心態？`, a: `要能「入得進去」也要「出得出來」。` },
+{ q: `在弘法形式上，文本提到的例子包括哪些？`, a: `隨緣勸兩句、登台講法、寫文章等。` },
+{ q: `為何不能坐視眾生苦惱不管？`, a: `因為眾生皆是過去的親眷，且與我一體。` },
+{ q: `「學法誠可貴，弘法價更高」在淨宗法師看來，這兩者最終應歸向何處？`, a: `歸在念佛當中。` },
+{ q: `「隨分隨力」是指在弘法時應抱持什麼樣的原則？`, a: `盡自己能做的去做，不強求超越能力的結果。` },
+{ q: `念佛法喜固然清閒，但法師提醒若不弘法，可能反映出什麼問題？`, a: `心（利他之心/菩提心）還是沒有發起來。` },
+{ q: `修行者在安心後弘法的心理基礎是什麼？`, a: `報恩心與憐憫心。` },
+{ q: `「欲得捨此娑婆生死之身...聞即信行者，不惜身命，急為說之」強調了什麼？`, a: `弘法傳播的迫切性與重要性。` },
+{ q: `根據文本，報佛恩最直接的方式是否為建大樓或供水果？`, a: `不是，而是勸人歸往淨土。` },
+{ q: `為什麼念佛「上路子」的人值得恭喜？`, a: `因為能體會到稱名的法喜且能持續行持。` },
+{ q: `「自信教人信」中，哪一部分被描述為「難中轉更難」？`, a: `教人信（勸他人信受淨土法門）。` },
+{ q: `「解行並進」與「行起解絕」在修行的不同階段各有什麼作用？`, a: `前者是互相助益的過程，後者是信心堅固、心境不亂的體現。` },
+{ q: `法師提到的「中道」在弘法利生中如何體現？`, a: `隨緣勸化，不因追求量而給自己過大壓力或廢止念佛。` },
+{ q: `若一個人發了財（念佛得安穩）卻看著他人受苦而無動於衷，這違背了什麼？`, a: `悲心與自他一體的觀念。` }
+        ];
+
+        let currentCard = 0;
+        let isFlipped = false;
+        let currentFontSize = 24;
+
+        function initFlashcards() {
+            if(flashcards.length > 0) updateCard();
+        }
+
+        function updateCard(keepFlipped = false) {
+            const card = flashcards[currentCard];
+            
+            document.getElementById('questionText').innerHTML = card.q.replace(/\n/g, '<br>');
+            
+            if (isUnlocked) {
+                document.getElementById('answerText').innerHTML = card.a.replace(/\n/g, '<br>');
+                document.getElementById('speakBtnA').style.display = 'block';
+            } else {
+                document.getElementById('answerText').innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; color: #888;">
+                        <i class="fas fa-lock" style="font-size: 3.5em; margin-bottom: 15px; color: #8d6e63;"></i>
+                        <h3 style="margin: 0 0 5px 0; color: #5d4037;">答案已上鎖</h3>
+                        <p style="font-size: 0.85em; margin: 0 0 20px 0;">公開時間：${unlockTimeStr}</p>
+                        <div style="width: 100%; max-width: 250px;">
+                            <input type="password" id="pwd-input" class="lock-input" placeholder="輸入密碼提前解鎖" 
+                                   onclick="event.stopPropagation();" 
+                                   onkeydown="event.stopPropagation(); if(event.key === 'Enter') verifyPassword();">
+                            <button class="lock-btn" onclick="event.stopPropagation(); verifyPassword();">
+                                解鎖全部答案
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('speakBtnA').style.display = 'none';
+            }
+
+            document.getElementById('statusText').textContent = `第 ${currentCard + 1} 題，共 ${flashcards.length} 題`;
+            
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === flashcards.length - 1;
+            
+            if (!keepFlipped && isFlipped) {
+                document.getElementById('flashcard').classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCard < flashcards.length - 1) { currentCard++; updateCard(); }
+        }
+
+        function prevCard() {
+            if (currentCard > 0) { currentCard--; updateCard(); }
+        }
+
+        function randomCard() {
+            if (flashcards.length <= 1) return;
+            let newCard;
+            do { newCard = Math.floor(Math.random() * flashcards.length); } while (newCard === currentCard);
+            currentCard = newCard;
+            updateCard();
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 40) currentFontSize = 40;
+            document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+        }
+
+        function speakText(event, side) {
+            event.stopPropagation();
+            const textHTML = flashcards[currentCard][side];
+            const text = textHTML.replace(/<[^>]*>?/gm, ''); 
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器不支援語音朗讀功能");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkLock);
+    </script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弘法十二不 - 學習測驗</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #5d4037;
+            --secondary-color: #8d6e63;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --font-size-base: 24px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+        #main-content { width: 100%; max-width: 800px; }
+        .container { width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary-color); font-size: 1.5em; margin: 0 0 10px 0; }
+        .progress-container {
+            width: 100%; height: 10px; background-color: #e0e0e0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background-color: var(--primary-color);
+            width: 0%; transition: width 0.3s ease;
+        }
+        .status-text { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .flashcard {
+            perspective: 1000px; width: 100%; min-height: 350px; cursor: pointer; margin-bottom: 30px;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d; min-height: 350px;
+        }
+        .flashcard.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background-color: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            transform: rotateY(180deg); background-color: #fafafa; border: 2px solid var(--primary-color);
+        }
+        .card-content { font-size: 1.2em; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+        .card-label {
+            position: absolute; top: 15px; left: 20px; font-size: 0.7em;
+            color: #999; text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        button.ctrl-btn {
+            padding: 12px 24px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        button.ctrl-btn:hover { background-color: var(--secondary-color); }
+        button.ctrl-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .size-controls button, .speak-btn {
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em;
+        }
+        .size-controls button:hover, .speak-btn:hover {
+            background-color: var(--primary-color); color: white;
+        }
+        
+        .lock-input {
+            width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; 
+            border-radius: 5px; box-sizing: border-box; text-align: center; font-size: 16px;
+        }
+        .lock-btn {
+            width: 100%; padding: 10px; background-color: #5d4037; color: white; 
+            border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;
+        }
+        .lock-btn:hover { background-color: #8d6e63; }
+
+        @media (max-width: 600px) {
+            :root { --font-size-base: 20px; }
+            .controls { gap: 10px; }
+            button.ctrl-btn { padding: 10px 15px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-content">
+        <div class="container">
+            <div class="top-controls">
+                <a href="index.html" style="text-decoration: none; color: var(--primary-color); font-size: 0.9em;">
+                    <i class="fas fa-arrow-left"></i> 回首頁
+                </a>
+                <div class="size-controls">
+                    <button onclick="changeFontSize(-2)">A-</button>
+                    <button onclick="changeFontSize(2)">A+</button>
+                </div>
+            </div>
+
+            <div class="header">
+                <h1>弘法十二不</h1>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">正在連線確認解鎖狀態...</div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-label">問題</span>
+                        <button class="speak-btn" onclick="speakText(event, 'q')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="questionText">載入中...</div>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">答案</span>
+                        <button class="speak-btn" id="speakBtnA" onclick="speakText(event, 'a')" style="position: absolute; top: 10px; right: 10px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="card-content" id="answerText" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevCard()">
+                    <i class="fas fa-chevron-left"></i> 上一題
+                </button>
+                <button class="ctrl-btn" onclick="randomCard()">
+                    <i class="fas fa-random"></i> 隨機
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextCard()">
+                    下一題 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "3571";
+        const unlockTimeStr = "2026/06/30 00:00"; 
+        const pageId = "C06";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbwsB39S65NUQ9b2-XdqrSb8rtb2CkaNSfkzM6WjlD1UfOD86C6HKof_VLhwCUjYrjSOzg/exec";
+        
+        let isUnlocked = false;
+        
+        async function checkLock() {
+            if (!unlockTimeStr) {
+                isUnlocked = true;
+                initFlashcards();
+                return;
+            }
+            
+            const unlockDate = new Date(unlockTimeStr).getTime();
+            const now = new Date().getTime();
+            if (now >= unlockDate || sessionStorage.getItem("unlocked_" + pageId) === "true") {
+                isUnlocked = true;
+                initFlashcards();
+                return;
+            }
+
+            try {
+                const res = await fetch(gasUrl + "?pageId=" + encodeURIComponent(pageId));
+                const data = await res.json();
+                if (data.isUnlocked) {
+                    isUnlocked = true;
+                    sessionStorage.setItem("unlocked_" + pageId, "true");
+                }
+            } catch (e) {
+                console.log("雲端同步失敗", e);
+            }
+            
+            initFlashcards(); 
+        }
+
+        async function verifyPassword() {
+            const inputElement = document.getElementById("pwd-input");
+            if (!inputElement) return;
+            const input = inputElement.value;
+            const btn = inputElement.nextElementSibling;
+            
+            if (input === correctPassword || correctPassword === "") {
+                btn.innerText = "解鎖中...";
+                btn.disabled = true;
+                
+                try {
+                    await fetch(gasUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'unlock', pageId: pageId, password: input })
+                    });
+                } catch (e) { console.log(e); }
+                
+                sessionStorage.setItem("unlocked_" + pageId, "true");
+                isUnlocked = true;
+                updateCard(true); 
+            } else {
+                alert("密碼錯誤，請重新輸入！");
+                inputElement.value = "";
+            }
+        }
+
+        const flashcards = [
+{ q: `根據《弘法十二不》，弘法人員在面對大眾簇擁、鮮花與掌聲時，應保持何種心理狀態？`, a: `應保持理性、冷靜、警惕，常懷慚愧，並仰謝佛恩。` },
+{ q: `《弘法十二不》描述「名利之心」具備哪些細微而危險的特性？`, a: `名利之心微細、狡猾、甜蜜、細軟、隱蔽且危險。` },
+{ q: `在弘法過程中，「佛」與「我」（小我）的關係被形容為如何？`, a: `兩者勢不兩立；「我」字當頭時，佛光便會隱沒。` },
+{ q: `文中以何種生物比喻「小我」遇到名利之風會迅速膨脹？`, a: `迦羅求羅蟲。` },
+{ q: `弘法者若想避免「逞能好勝」，應當如何自處？`, a: `甘做一個「愚人」，徹底躺倒，僅如鸚鵡學舌般念佛。` },
+{ q: `文中建議使用什麼工具將「小我」牢牢釘在「機法兩種深信」的大地上？`, a: `六字名號（南無阿彌陀佛）的圖釘。` },
+{ q: `當弘法者自認為「能代人消業、為人超度」時，其本質上是落入了什麼陷阱？`, a: `落入了「我」的狡猾陷阱，將「佛 + 我」視為萬能。` },
+{ q: `何謂「藉佛宣我」的行為？`, a: `躲在佛的大袍下，表面宣揚佛法，實則宣傳自我。` },
+{ q: `「藉佛靈驗，障佛光明」的主要危害是什麼？`, a: `貪盜佛的功德來滋肥弘法者自己的身分。` },
+{ q: `《弘法十二不》中「不要大包大攬」的核心主張為何？`, a: `只引導大眾念佛求往生，不輕易許諾解決其餘世間雜事。` },
+{ q: `文中提到的「根本」與「枝末」分別指代什麼？`, a: `「根本」指往生大事，「枝末」指現世利益。` },
+{ q: `為何弘法者不應「越俎代庖」替眾生面對彌陀？`, a: `因為信仰是一對一的世界，必須由個人單獨面對彌陀。` },
+{ q: `在信仰的「白道」上，參與者的數量有何限制？`, a: `絕無二人同行，從來都是一人單獨踏上。` },
+{ q: `文中將介入彌陀與眾生之間的「萬能的我」比喻為何種商業角色？`, a: `中間商（兩頭吃利，阻隔廠家與消費者見面）。` },
+{ q: `針對「不要揠苗助長」，開發信心的正確著力點應在哪裡？`, a: `應從根部著力，而非從梢上強制拔高。` },
+{ q: `文中提出的唯一「入道門徑」包含哪些要素？`, a: `反復聞薰、相續念佛、祈求佛加。` },
+{ q: `大眾心理中常見的「造神」動機是什麼？`, a: `因為佛看不見、搆不著，希望有人能代為與神佛溝通。` },
+{ q: `具備哪些特質的人容易被選作「准神佛」？`, a: `口才好、頭腦好、有魅力且肯發心者。` },
+{ q: `對於被選作崇拜對象的人，文中給出了什麼樣的嚴厲警告？`, a: `誰甘心入選、享受崇拜，誰就接近地獄。` },
+{ q: `如何才能做到「萬魔莫犯」？`, a: `甘於守住平凡。` },
+{ q: `文中如何形容「玄妙、奇特、神異、怪誕」之事？`, a: `皆為「淫巧之術」，是禍人的開端。` },
+{ q: `「六字大道」的特性被形容為如同什麼？`, a: `猶如虛空，深邃無底而平淡無奇。` },
+{ q: `為何凡夫不應追求「靈應體驗」來證悟涅槃？`, a: `因為凡夫之體是貪瞋罪惡之體，無法以凡情測度佛境。` },
+{ q: `文中以什麼比喻「徒勞無益地想要衡量虛空」？`, a: `丈尺欲量虛空。` },
+{ q: `若弘法或修學中出現了「體驗」，正確的處理態度是什麼？`, a: `將其拋之東洋大海，還原為「愚癡念佛」的狀態。` },
+{ q: `「一隻螞蟻乘波音 747」的比喻旨在說明什麼道理？`, a: `眾生仰賴佛力往生，並不需要（也無法）完全體驗或理解佛智境界。` },
+{ q: `根據「不可自充裁判」一則，哪些事唯有佛能知見？`, a: `誰得信心、誰上白道、誰是真弟子、誰往生等。` },
+{ q: `《大經》中提到哪類聖者亦無法測度佛境？`, a: `二乘（聲聞、緣覺）。` },
+{ q: `文中引用「蟪蛄不知朱陽之節」是為了說明什麼？`, a: `凡夫（如短命的蟬）無法理解聖者的廣大境界。` },
+{ q: `為何不應「妄言幽冥」或過度熱衷於度化附體？`, a: `因為神怪與附體會隨心而現，層出不窮，荒誕不經。` },
+{ q: `「妄見境界」的根本原因通常是什麼？`, a: `知見不正、心氣浮躁，且心有所好。` },
+{ q: `念佛之人與境界感通的正確關係應為何？`, a: `唯以佛名為緣，平實平淡，不特別希求感通。` },
+{ q: `在弘法的第一線，法師與布教人員應對名利持什麼態度？`, a: `保持警惕，常懷慚愧，深信自己是罪惡生死凡夫（懷機深信）。` },
+{ q: `「名利勾小我，小我貪名利」描述了兩者之間怎樣的關係？`, a: `串通一氣，彼此呼應。` },
+{ q: `「一葉障目，不見泰山」在文中比喻什麼現象？`, a: `「我」字當頭導致佛光被遮蔽、佛德隱沒。` },
+{ q: `文中提到的「如鸚鵡學舌」修行方式強調了什麼？`, a: `強調放下自我能耐，單純依靠名號。` },
+{ q: `為何說「佛 + 我 = 萬能」是狡猾的？`, a: `因為它本質上是為了顯露「我」的能耐，而非全依佛力。` },
+{ q: `「不以往生為重，現世利益也要失去」這句話說明了什麼因果關係？`, a: `若捨棄了往生這個「根本」，則「枝末」的現世利益也難保。` },
+{ q: `「一人踏上白道」的「白道」出自佛教哪種類比？`, a: `二河白道喻。` },
+{ q: `文中提到的「揠苗助長」會對眾生的法身慧命造成什麼後果？`, a: `唯令速死（導致信仰根基毀壞）。` },
+{ q: `大眾將弘法者視為「犧牲的祭品」和「降福的化身」反映了什麼樣的心理？`, a: `反映了大眾選神、造神、拜神的宿昔心理。` },
+{ q: `為何「甘守平凡」能避開萬魔？`, a: `因為平凡無奇便無從讓魔利用修行者的喜好與傲慢來干擾。` },
+{ q: `「空合空」在文中形容什麼狀態？`, a: `形容口稱名號與法界大道契合，不容任何雕琢造作。` },
+{ q: `文中提到的「凡夫之驗」本質是什麼？`, a: `是歷劫生死的業力反應，而非真正的解脫體驗。` },
+{ q: `「坐地日行八萬里」的例子是用來反駁哪種修行誤區？`, a: `反駁「必須有主觀體驗才算真實」的愚執。` },
+{ q: `弘法者在指認「誰是真佛弟子」時，犯了什麼錯誤？`, a: `越權自充裁判，干涉唯佛方能明瞭的事項。` },
+{ q: `「垢障凡夫，兩眼漆黑」這句話是用來警示誰的？`, a: `警示那些隨意對他人往生與否說三道四的弘法者。` },
+{ q: `為何在某道場被度的著名人士，在另一道場又會出現？`, a: `這證明了某些幽冥法事的宣稱往往荒誕不經，受心識幻化影響。` },
+{ q: `「萬法唯心」在「妄言幽冥」這一節中如何解釋境界的產生？`, a: `心有所好，必有所見；心氣浮躁與無始業種交感而翻現境界。` },
+{ q: `《弘法十二不》的作者是誰？`, a: `釋淨宗。` },
+{ q: `弘法者應如何對待大眾的「頂禮」？`, a: `保持冷靜，仰謝佛恩，不生自我膨脹之心。` },
+{ q: `「小我之蟲」膨脹的觸發條件是什麼？`, a: `遇到名利之風。` },
+{ q: `「信仰是一對一的世界」中，「二」指代誰？`, a: `指眾生與彌陀（不容第三者介入代庖）。` },
+{ q: `文中建議弘法者示人時，應依據什麼？`, a: `應只以教理、佛言祖語示人。` },
+{ q: `追求真理在文中被形容為一段怎樣的歷程？`, a: `辛苦的、孤獨的。` },
+{ q: `「淫巧之術」在弘法中通常具備什麼特徵？`, a: `具備玄妙、奇特、神異或怪誕的特徵。` },
+{ q: `為何說「無體驗，正好老老實實念佛」？`, a: `因為沒有虛幻境界的干擾，更能安守本分。` }
+        ];
+
+        let currentCard = 0;
+        let isFlipped = false;
+        let currentFontSize = 24;
+
+        function initFlashcards() {
+            if(flashcards.length > 0) updateCard();
+        }
+
+        function updateCard(keepFlipped = false) {
+            const card = flashcards[currentCard];
+            
+            document.getElementById('questionText').innerHTML = card.q.replace(/\n/g, '<br>');
+            
+            if (isUnlocked) {
+                document.getElementById('answerText').innerHTML = card.a.replace(/\n/g, '<br>');
+                document.getElementById('speakBtnA').style.display = 'block';
+            } else {
+                document.getElementById('answerText').innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; color: #888;">
+                        <i class="fas fa-lock" style="font-size: 3.5em; margin-bottom: 15px; color: #8d6e63;"></i>
+                        <h3 style="margin: 0 0 5px 0; color: #5d4037;">答案已上鎖</h3>
+                        <p style="font-size: 0.85em; margin: 0 0 20px 0;">公開時間：${unlockTimeStr}</p>
+                        <div style="width: 100%; max-width: 250px;">
+                            <input type="password" id="pwd-input" class="lock-input" placeholder="輸入密碼提前解鎖" 
+                                   onclick="event.stopPropagation();" 
+                                   onkeydown="event.stopPropagation(); if(event.key === 'Enter') verifyPassword();">
+                            <button class="lock-btn" onclick="event.stopPropagation(); verifyPassword();">
+                                解鎖全部答案
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('speakBtnA').style.display = 'none';
+            }
+
+            document.getElementById('statusText').textContent = `第 ${currentCard + 1} 題，共 ${flashcards.length} 題`;
+            
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === flashcards.length - 1;
+            
+            if (!keepFlipped && isFlipped) {
+                document.getElementById('flashcard').classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCard < flashcards.length - 1) { currentCard++; updateCard(); }
+        }
+
+        function prevCard() {
+            if (currentCard > 0) { currentCard--; updateCard(); }
+        }
+
+        function randomCard() {
+            if (flashcards.length <= 1) return;
+            let newCard;
+            do { newCard = Math.floor(Math.random() * flashcards.length); } while (newCard === currentCard);
+            currentCard = newCard;
+            updateCard();
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 16) currentFontSize = 16;
+            if (currentFontSize > 40) currentFontSize = 40;
+            document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+        }
+
+        function speakText(event, side) {
+            event.stopPropagation();
+            const textHTML = flashcards[currentCard][side];
+            const text = textHTML.replace(/<[^>]*>?/gm, ''); 
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器不支援語音朗讀功能");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkLock);
+    </script>
+</body>
+</html>
